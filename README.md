@@ -34,9 +34,21 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/booking/confirmation` | Post-payment confirmation |
 | `/booking/failed` | Failed / pending payment |
 | `/how-it-works` | Static flow explanation |
+| `/studio` | Sanity Studio (manage packages) |
 | `/api/upload-signature` | Cloudinary signed upload |
 | `/api/booking` | Create pending booking (+ payment URL when configured) |
 | `/api/booking/status` | Booking status lookup |
+
+## Sanity Studio
+
+1. Add CORS origins in [Sanity Manage](https://www.sanity.io/manage) → your project → **API** → **CORS origins**:
+   - `http://localhost:3000`
+   - your Vercel URL (e.g. `https://gojoclicks-project.vercel.app`)
+   - Allow credentials: on
+2. Run `npm run dev` and open [http://localhost:3000/studio](http://localhost:3000/studio)
+3. Log in with the Sanity account that owns the project
+4. Create **Advertising Package** documents (title, slug, price, features, image, featured)
+5. Publish — they appear on `/` (if featured) and `/packages`
 
 ## Environment
 

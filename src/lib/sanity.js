@@ -1,4 +1,5 @@
 import { createClient } from "@sanity/client";
+import imageUrlBuilder from "@sanity/image-url";
 
 const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID;
 const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET || "production";
@@ -23,15 +24,30 @@ function getClient() {
   return client;
 }
 
+export function urlForImage(source) {
+  const sanity = getClient();
+  if (!sanity || !source) {
+    return null;
+  }
+
+  return imageUrlBuilder(sanity).image(source);
+}
+
 const packageFields = `
   _id,
   title,
-  slug,
+  "slug": slug.current,
   description,
   price,
   features,
-  image,
-  featured
+  featured,
+  image{
+    ...,
+    asset->{
+      _id,
+      url
+    }
+  }
 `;
 
 /**
@@ -44,11 +60,16 @@ export async function getPackages() {
     return [];
   }
 
-  return sanity.fetch(
-    `*[_type == "package"] | order(price asc) {
-      ${packageFields}
-    }`
-  );
+  try {
+    return await sanity.fetch(
+      `*[_type == "package"] | order(price asc) {
+        ${packageFields}
+      }`
+    );
+  } catch (error) {
+    console.error("getPackages failed:", error.message || error);
+    return [];
+  }
 }
 
 /**
@@ -61,13 +82,18 @@ export async function getFeaturedPackages(limit = 3) {
     return [];
   }
 
-  const packages = await sanity.fetch(
-    `*[_type == "package" && featured == true] | order(price asc) {
-      ${packageFields}
-    }`
-  );
+  try {
+    const packages = await sanity.fetch(
+      `*[_type == "package" && featured == true] | order(price asc) {
+        ${packageFields}
+      }`
+    );
 
-  return Array.isArray(packages) ? packages.slice(0, limit) : [];
+    return Array.isArray(packages) ? packages.slice(0, limit) : [];
+  } catch (error) {
+    console.error("getFeaturedPackages failed:", error.message || error);
+    return [];
+  }
 }
 
 /**
@@ -80,10 +106,15 @@ export async function getPackageBySlug(slug) {
     return null;
   }
 
-  return sanity.fetch(
-    `*[_type == "package" && slug.current == $slug][0] {
-      ${packageFields}
-    }`,
-    { slug }
-  );
+  try {
+    return await sanity.fetch(
+      `*[_type == "package" && slug.current == $slug][0] {
+        ${packageFields}
+      }`,
+      { slug }
+    );
+  } catch (error) {
+    console.error("getPackageBySlug failed:", error.message || error);
+    return null;
+  }
 }

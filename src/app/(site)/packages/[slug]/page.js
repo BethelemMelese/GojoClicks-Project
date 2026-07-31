@@ -1,6 +1,9 @@
+import Image from "next/image";
 import { notFound } from "next/navigation";
-import { getPackageBySlug } from "@/lib/sanity";
 import BookingStepper from "@/components/BookingStepper";
+import { getPackageBySlug, urlForImage } from "@/lib/sanity";
+
+export const revalidate = 60;
 
 export async function generateMetadata({ params }) {
   const pkg = await getPackageBySlug(params.slug);
@@ -16,9 +19,23 @@ export default async function PackageDetailPage({ params }) {
     notFound();
   }
 
+  const imageUrl = pkg.image
+    ? urlForImage(pkg.image)?.width(1200).height(700).url()
+    : null;
+
   return (
     <div>
       <article style={{ marginBottom: "2rem" }}>
+        {imageUrl && (
+          <Image
+            src={imageUrl}
+            alt={pkg.image?.alt || pkg.title}
+            width={1200}
+            height={700}
+            style={{ width: "100%", height: "auto", marginBottom: "1rem" }}
+            priority
+          />
+        )}
         <h1>{pkg.title}</h1>
         <p>{pkg.description}</p>
         <p>
@@ -41,7 +58,7 @@ export default async function PackageDetailPage({ params }) {
         </p>
         <BookingStepper
           packageId={pkg._id}
-          packageSlug={pkg.slug?.current || pkg.slug}
+          packageSlug={pkg.slug}
           packageTitle={pkg.title}
           packagePrice={pkg.price}
         />
