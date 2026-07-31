@@ -1,95 +1,50 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+import Link from "next/link";
+import { getFeaturedPackages } from "@/lib/sanity";
 
-export default function Home() {
+export default async function HomePage() {
+  const featuredPackages = await getFeaturedPackages(3);
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
-        <Image
-          className={styles.logo}
-          src="https://nextjs.org/icons/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+    <div>
+      <section style={{ marginBottom: "2.5rem" }}>
+        <h1>GojoClicks</h1>
+        <p>
+          Advertising packages for brands in Ethiopia. Browse a package, submit
+          your campaign assets, and pay when you are ready.
+        </p>
+        <p style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+          <Link href="/packages">View all packages</Link>
+          <Link href="/how-it-works">How it works</Link>
+        </p>
+      </section>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="https://nextjs.org/icons/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="https://nextjs.org/icons/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      <section>
+        <h2>Featured packages</h2>
+        {featuredPackages.length === 0 ? (
+          <p>
+            No featured packages yet. Connect Sanity and mark packages as
+            featured, or open the full listing.
+          </p>
+        ) : (
+          <ul style={{ listStyle: "none", padding: 0, display: "grid", gap: "1rem" }}>
+            {featuredPackages.map((pkg) => (
+              <li
+                key={pkg._id}
+                style={{ border: "1px solid #e5e5e5", padding: "1rem" }}
+              >
+                <h3>{pkg.title}</h3>
+                <p>{pkg.description}</p>
+                <p>
+                  <strong>{pkg.price}</strong> ETB
+                </p>
+                <Link href={`/packages/${pkg.slug?.current || pkg.slug}`}>
+                  View package
+                </Link>
+              </li>
+            ))}
+          </ul>
+        )}
+      </section>
     </div>
   );
 }
