@@ -1,0 +1,62 @@
+export const HERO_SLIDES = [
+  {
+    id: "real-estate-boost",
+    eyebrow: "Featured Campaign",
+    title: "Sell Properties Faster with",
+    highlight: "Precision Ads",
+    description:
+      "15-day Facebook & Instagram campaigns built for Ethiopian real estate — more WhatsApp leads, more viewings, more closings.",
+    ctaLabel: "Explore Packages",
+    ctaHref: "/packages",
+    secondaryLabel: "How It Works",
+    secondaryHref: "/how-it-works",
+    image:
+      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Modern residential buildings in warm evening light",
+    accent: "from-navy via-[#152a4a] to-[#0d1b33]",
+    badge: "Real Estate Focus",
+    metricLabel: "Avg. Lead Lift",
+    metricValue: "+214%",
+    metricHint: "in 15-day campaigns",
+  },
+  {
+    id: "brand-awareness",
+    eyebrow: "Brand Spotlight",
+    title: "Turn Local Brands into",
+    highlight: "Citywide Names",
+    description:
+      "Story-driven creatives and targeted placements that put your agency in front of buyers, investors, and diaspora audiences.",
+    ctaLabel: "Start Booking",
+    ctaHref: "/packages",
+    secondaryLabel: "View Channels",
+    secondaryHref: "/#channels",
+    image:
+      "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Creative team reviewing campaign boards",
+    accent: "from-[#1a1410] via-[#2a1f14] to-navy",
+    badge: "Awareness Push",
+    metricLabel: "Monthly Reach",
+    metricValue: "12.4M+",
+    metricHint: "across key metros",
+  },
+  {
+    id: "lead-machine",
+    eyebrow: "Lead Engine",
+    title: "WhatsApp Inquiries on",
+    highlight: "Autopilot",
+    description:
+      "Optimized funnels that deliver hot leads straight to your phone — tracked, reported, and refined daily by GojoClicks.",
+    ctaLabel: "Choose a Package",
+    ctaHref: "/packages",
+    secondaryLabel: "See Results",
+    secondaryHref: "/how-it-works",
+    image:
+      "https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=80",
+    imageAlt: "Marketer analyzing performance on laptop",
+    accent: "from-[#0f1f1a] via-navy to-[#0d1b33]",
+    badge: "Performance Ads",
+    metricLabel: "Leads Delivered",
+    metricValue: "1,000+",
+    metricHint: "on Platinum tier",
+  },
+];

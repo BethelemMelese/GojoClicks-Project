@@ -1,6 +1,7 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import BookingStepper from "@/components/BookingStepper";
+import Container from "@/components/ui/Container";
 import { getPackageBySlug, urlForImage } from "@/lib/sanity";
 
 export const revalidate = 60;
@@ -24,7 +25,7 @@ export default async function PackageDetailPage({ params }) {
     : null;
 
   return (
-    <div>
+    <Container className="py-10 md:py-14">
       <article style={{ marginBottom: "2rem" }}>
         {imageUrl && (
           <Image
@@ -63,6 +64,6 @@ export default async function PackageDetailPage({ params }) {
           packagePrice={pkg.price}
         />
       </section>
-    </div>
+    </Container>
   );
 }

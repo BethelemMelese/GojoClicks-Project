@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Container from "@/components/ui/Container";
 
 export const metadata = {
   title: "Payment failed — GojoClicks",
@@ -13,8 +14,8 @@ export default function BookingFailedPage({ searchParams }) {
   const bookingRef = searchParams?.ref || null;
 
   return (
-    <div>
-      <h1>Payment not completed</h1>
+    <Container className="py-10 md:py-14">
+      <h1 className="font-display text-headline-md">Payment not completed</h1>
       <p>
         Your payment failed or is still pending. You can retry when payment is
         connected, or return to packages.
@@ -31,6 +32,6 @@ export default function BookingFailedPage({ searchParams }) {
         </button>
         <Link href="/packages">Back to packages</Link>
       </p>
-    </div>
+    </Container>
   );
 }

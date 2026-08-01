@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Container from "@/components/ui/Container";
 
 export const metadata = {
   title: "How it works — GojoClicks",
@@ -29,8 +30,8 @@ const STEPS = [
 
 export default function HowItWorksPage() {
   return (
-    <div>
-      <h1>How it works</h1>
+    <Container className="py-10 md:py-14">
+      <h1 className="font-display text-headline-md">How it works</h1>
       <p>Five simple steps from package to confirmed booking.</p>
       <ol style={{ display: "grid", gap: "1rem", paddingLeft: "1.25rem" }}>
         {STEPS.map((step, index) => (
@@ -45,6 +46,6 @@ export default function HowItWorksPage() {
       <p style={{ marginTop: "1.5rem" }}>
         <Link href="/packages">Browse packages</Link>
       </p>
-    </div>
+    </Container>
   );
 }

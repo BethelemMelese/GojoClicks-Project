@@ -1,3 +1,5 @@
+import Container from "@/components/ui/Container";
+
 export const metadata = {
   title: "Booking confirmation — GojoClicks",
 };
@@ -11,8 +13,8 @@ export default function BookingConfirmationPage({ searchParams }) {
   const bookingRef = searchParams?.ref || null;
 
   return (
-    <div>
-      <h1>Booking confirmation</h1>
+    <Container className="py-10 md:py-14">
+      <h1 className="font-display text-headline-md">Booking confirmation</h1>
       <p>
         This page will load booking status from Supabase and show package name,
         amount, and reference.
@@ -27,6 +29,6 @@ export default function BookingConfirmationPage({ searchParams }) {
         Status lookup will call <code>/api/booking/status</code> in the next
         phase.
       </p>
-    </div>
+    </Container>
   );
 }

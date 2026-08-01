@@ -4,7 +4,8 @@ Package booking frontend for an Ethiopian advertising agency. Clients browse pac
 
 ## Stack
 
-- Next.js 14 (App Router)
+- Next.js 14 (App Router) + Tailwind CSS
+- Design system: see [`DESIGN.md`](./DESIGN.md) (Kinetic Authority)
 - Sanity CMS — advertising packages
 - Supabase — bookings + payment status
 - Cloudinary — signed direct uploads
@@ -49,6 +50,28 @@ Open [http://localhost:3000](http://localhost:3000).
 3. Log in with the Sanity account that owns the project
 4. Create **Advertising Package** documents (title, slug, price, features, image, featured)
 5. Publish — they appear on `/` (if featured) and `/packages`
+
+## Supabase bookings table
+
+1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project
+2. Go to **SQL Editor** → **New query**
+3. Paste the contents of [`supabase/bookings.sql`](./supabase/bookings.sql)
+4. Click **Run**
+5. Confirm under **Table Editor** that `bookings` exists
+
+The table stores the full client registration form. Row Level Security is enabled with no public policies — only the server `SUPABASE_SERVICE_ROLE_KEY` (used in API routes) can read/write bookings.
+
+Allowed values worth knowing:
+
+| Column | Values |
+|--------|--------|
+| `status` | `pending`, `paid`, `failed`, `cancelled` |
+| `ad_platform` | `gojoclicks`, `own_page`, `both` |
+| `lead_delivery_method` | `whatsapp`, `phone_calls`, `messenger`, `instagram_dm`, `email`, `dashboard` |
+| `property_type` | `apartment`, `villa_house`, `condominium`, `commercial`, `land`, `office`, `other` |
+| `campaign_duration` | `7_days`, `15_days`, `30_days`, `60_days`, `custom` |
+| `has_content_ready` | `yes`, `needs_creation` |
+| `ad_language` | `amharic`, `english`, `both` |
 
 ## Environment
 

@@ -20,7 +20,7 @@ export async function GET(request) {
     const supabase = createSupabaseServiceClient();
 
     let query = supabase.from("bookings").select(
-      "id, reference, status, package_title, amount, client_name, client_email, created_at"
+      "id, reference, status, package_title, amount, full_name, email, phone, created_at"
     );
 
     query = id ? query.eq("id", id) : query.eq("reference", ref);
