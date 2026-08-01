@@ -1,8 +1,8 @@
+import Image from "next/image";
 import Badge from "@/components/ui/Badge";
 import Button from "@/components/ui/Button";
 import Reveal from "@/components/ui/Reveal";
 import { IconCheck, PackageIcon } from "@/components/ui/Icons";
-import { cn } from "@/lib/utils/cn";
 
 function formatPrice(price) {
   const numeric = Number(price);
@@ -18,33 +18,42 @@ const badgeVariant = {
 
 export default function PackageListCard({ package: pkg, index = 0 }) {
   const previewFeatures = (pkg.features || []).slice(0, 4);
+  const hasImage = Boolean(pkg.image);
 
   return (
     <Reveal delay={Math.min(index * 80, 320)} className="h-full">
       <article className="group flex h-full flex-col overflow-hidden rounded-lg border border-border-soft bg-white shadow-elev1 transition-all duration-300 hover:-translate-y-1 hover:shadow-elev2">
-        {/* Icon header (replaces photo from design) */}
-        <div className="relative flex h-40 items-center justify-center bg-gradient-to-br from-navy via-[#152a4a] to-[#0d1b33] md:h-44">
+        <div className="relative h-44 overflow-hidden bg-navy md:h-48">
+          {hasImage ? (
+            <Image
+              src={pkg.image}
+              alt={pkg.imageAlt || `${pkg.title} package`}
+              fill
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              className="object-cover transition duration-500 group-hover:scale-105"
+            />
+          ) : (
+            <div className="flex h-full items-center justify-center bg-gradient-to-br from-navy via-[#152a4a] to-[#0d1b33]">
+              <span className="inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/10 text-gold ring-1 ring-white/15">
+                <PackageIcon name={pkg.icon} className="h-8 w-8" />
+              </span>
+            </div>
+          )}
+
           <div
-            className="pointer-events-none absolute inset-0 opacity-20"
-            style={{
-              backgroundImage:
-                "radial-gradient(circle at 30% 30%, rgba(232,169,59,0.45), transparent 45%)",
-            }}
+            className="pointer-events-none absolute inset-0 bg-gradient-to-t from-navy/70 via-navy/15 to-transparent"
             aria-hidden
           />
-          <span className="relative inline-flex h-16 w-16 items-center justify-center rounded-xl bg-white/10 text-gold ring-1 ring-white/15 transition duration-300 group-hover:scale-105">
-            <PackageIcon name={pkg.icon} className="h-8 w-8" />
-          </span>
 
           {pkg.badge ? (
-            <div className="absolute right-3 top-3">
+            <div className="absolute right-3 top-3 z-10">
               <Badge variant={badgeVariant[pkg.badge] || "muted"}>
                 {pkg.badge}
               </Badge>
             </div>
           ) : null}
 
-          <span className="absolute bottom-3 left-3 rounded-full bg-white/10 px-2.5 py-1 font-body text-[10px] font-semibold uppercase tracking-[0.1em] text-white/85">
+          <span className="absolute bottom-3 left-3 z-10 rounded-full bg-black/35 px-2.5 py-1 font-body text-[10px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur-sm">
             {pkg.duration}
           </span>
         </div>

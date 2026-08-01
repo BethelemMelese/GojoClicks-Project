@@ -41,7 +41,7 @@ export default function SiteHeader() {
       )}
     >
       <Container className="flex h-16 items-center justify-between gap-4 md:h-[72px]">
-        <BrandLogo />
+        <BrandLogo variant="light" size="md" />
 
         <nav className="hidden items-center gap-8 lg:flex" aria-label="Primary">
           {NAV_LINKS.map((link) => {

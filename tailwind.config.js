@@ -120,12 +120,12 @@ module.exports = {
         full: "9999px",
       },
       maxWidth: {
-        container: "1280px",
+        container: "1400px",
       },
       spacing: {
-        gutter: "24px",
-        "margin-desktop": "64px",
-        "margin-mobile": "20px",
+        gutter: "16px",
+        "margin-desktop": "24px",
+        "margin-mobile": "12px",
         "stack-sm": "8px",
         "stack-md": "16px",
         "stack-lg": "32px",

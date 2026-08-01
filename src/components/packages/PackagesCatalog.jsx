@@ -32,7 +32,7 @@ export default function PackagesCatalog({ packages = MOCK_PACKAGES }) {
   };
 
   return (
-    <>
+    <div id="packages-catalog">
       <PackagesToolbar
         industry={industry}
         budget={budget}
@@ -78,12 +78,12 @@ export default function PackagesCatalog({ packages = MOCK_PACKAGES }) {
               {hasMore ? (
                 <Reveal delay={120}>
                   <div className="mt-12 flex justify-center">
-                    <Button
+                    <button
                       type="button"
-                      variant="secondary"
                       onClick={() =>
                         setVisibleCount((count) => count + PACKAGES_PAGE_SIZE)
                       }
+                      className="inline-flex items-center gap-2 font-display text-sm font-bold uppercase tracking-wide text-gold transition duration-300 hover:text-[#d9992f]"
                     >
                       Load More Packages
                       <svg
@@ -100,7 +100,7 @@ export default function PackagesCatalog({ packages = MOCK_PACKAGES }) {
                           strokeLinejoin="round"
                         />
                       </svg>
-                    </Button>
+                    </button>
                   </div>
                 </Reveal>
               ) : null}
@@ -108,6 +108,6 @@ export default function PackagesCatalog({ packages = MOCK_PACKAGES }) {
           )}
         </Container>
       </section>
-    </>
+    </div>
   );
 }

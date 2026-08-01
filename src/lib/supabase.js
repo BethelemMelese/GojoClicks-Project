@@ -36,5 +36,9 @@ export function createSupabaseServiceClient() {
       autoRefreshToken: false,
       persistSession: false,
     },
+    // API routes only need PostgREST — skip realtime websocket init on Node 20
+    realtime: {
+      params: { eventsPerSecond: 0 },
+    },
   });
 }

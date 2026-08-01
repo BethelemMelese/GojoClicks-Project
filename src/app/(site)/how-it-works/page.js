@@ -20,7 +20,7 @@ const STEPS = [
   },
   {
     title: "Pay",
-    body: "Complete payment securely (Telebirr will be connected in a later phase).",
+    body: "Complete payment securely once your booking is confirmed by our team.",
   },
   {
     title: "Get confirmation",

@@ -27,7 +27,7 @@ export default function SiteFooter() {
           <div className="flex flex-col gap-12 lg:flex-row lg:items-start lg:justify-between lg:gap-20 xl:gap-28">
             {/* Brand block */}
             <div className="max-w-sm shrink-0 lg:max-w-xs">
-              <BrandLogo />
+              <BrandLogo variant="dark" size="lg" />
               <p className="mt-4 font-body text-sm leading-6 text-white/60">
                 {SITE.description}
               </p>

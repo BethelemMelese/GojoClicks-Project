@@ -5,6 +5,9 @@ export const MOCK_PACKAGES = [
     slug: "starter",
     title: "Starter",
     icon: "rocket",
+    image:
+      "https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "Modern apartment building exterior",
     price: 5000,
     duration: "15-Day Campaign",
     reach: "30,000+",
@@ -27,6 +30,9 @@ export const MOCK_PACKAGES = [
     slug: "growth",
     title: "Growth",
     icon: "chart",
+    image:
+      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "Contemporary residential property",
     price: 7500,
     duration: "15-Day Campaign",
     reach: "60,000+",
@@ -49,6 +55,9 @@ export const MOCK_PACKAGES = [
     slug: "professional",
     title: "Professional",
     icon: "trophy",
+    image:
+      "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "Marketing analytics dashboard on laptop",
     price: 10000,
     duration: "15-Day Campaign",
     reach: "100,000+",
@@ -73,6 +82,9 @@ export const MOCK_PACKAGES = [
     slug: "business",
     title: "Business",
     icon: "briefcase",
+    image:
+      "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "Bright modern office workspace",
     price: 12500,
     duration: "15-Day Campaign",
     reach: "150,000+",
@@ -97,6 +109,9 @@ export const MOCK_PACKAGES = [
     slug: "elite",
     title: "Elite",
     icon: "crown",
+    image:
+      "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "City skyline and commercial towers",
     price: 15000,
     duration: "15-Day Campaign",
     reach: "220,000+",
@@ -121,6 +136,9 @@ export const MOCK_PACKAGES = [
     slug: "enterprise",
     title: "Enterprise",
     icon: "building",
+    image:
+      "https://images.unsplash.com/photo-1545324418-cc1a3fa10c00?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "Large residential development",
     price: 17500,
     duration: "15-Day Campaign",
     reach: "300,000+",
@@ -145,6 +163,9 @@ export const MOCK_PACKAGES = [
     slug: "platinum",
     title: "Platinum",
     icon: "diamond",
+    image:
+      "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?auto=format&fit=crop&w=1200&q=80",
+    imageAlt: "Luxury interior living space",
     price: 20000,
     duration: "15-Day Campaign",
     reach: "500,000+",

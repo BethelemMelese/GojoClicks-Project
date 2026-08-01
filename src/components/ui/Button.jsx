@@ -9,6 +9,9 @@ const variants = {
   navy: "bg-navy text-white hover:bg-[#152741] hover:shadow-elev2 focus-visible:ring-navy",
   ghost:
     "bg-transparent text-navy hover:bg-surface-container-low focus-visible:ring-navy",
+  /** Outline control for navy / dark backgrounds */
+  outlineLight:
+    "border-2 border-white/35 bg-transparent text-white hover:border-white hover:bg-white hover:text-navy focus-visible:ring-white",
 };
 
 const sizes = {

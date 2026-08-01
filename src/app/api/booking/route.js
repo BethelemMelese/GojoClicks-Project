@@ -22,12 +22,27 @@ const REQUIRED_FIELDS = [
   "termsAccepted",
 ];
 
+function isUsablePaymentUrl(value) {
+  if (!value || typeof value !== "string") return false;
+  const trimmed = value.trim();
+  if (!trimmed || trimmed.includes("example") || trimmed.includes("ethiopia/api")) {
+    // Placeholder / stub hosts — skip payment until a real VPS URL is configured
+    return false;
+  }
+  try {
+    const url = new URL(trimmed);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
 /**
  * Creates a booking with status "pending", then (when configured) calls the
  * external payment service and returns a payment redirect URL.
  *
  * Telebirr logic lives on the VPS payment service — not in this app.
- * Until PAYMENT_SERVICE_URL is set, this returns the booking and a stub notice.
+ * Payment failures must NOT fail the booking itself.
  */
 export async function POST(request) {
   try {
@@ -67,7 +82,20 @@ export async function POST(request) {
       );
     }
 
-    const supabase = createSupabaseServiceClient();
+    let supabase;
+    try {
+      supabase = createSupabaseServiceClient();
+    } catch (error) {
+      console.error("Supabase client error:", error);
+      return NextResponse.json(
+        {
+          error:
+            "We couldn’t submit your booking right now. Please try again in a moment.",
+        },
+        { status: 500 }
+      );
+    }
+
     const reference = `GC-${Date.now().toString(36).toUpperCase()}`;
     const termsAcceptedAt = new Date().toISOString();
 
@@ -125,57 +153,68 @@ export async function POST(request) {
     const paymentServiceUrl = process.env.PAYMENT_SERVICE_URL;
     const paymentServiceSecret = process.env.PAYMENT_SERVICE_SECRET;
 
-    if (!paymentServiceUrl) {
+    if (!isUsablePaymentUrl(paymentServiceUrl)) {
+      return NextResponse.json({
+        booking,
+        paymentUrl: null,
+        message: "Booking received. Our team will follow up with next steps.",
+      });
+    }
+
+    try {
+      const base = paymentServiceUrl.replace(/\/$/, "");
+      const paymentResponse = await fetch(`${base}/payments/start`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${paymentServiceSecret}`,
+        },
+        body: JSON.stringify({
+          bookingId: booking.id,
+          reference: booking.reference,
+          amount: booking.amount,
+          currency: "ETB",
+          customer: {
+            name: body.fullName,
+            email: body.email,
+            phone: body.phone,
+          },
+        }),
+      });
+
+      if (!paymentResponse.ok) {
+        const paymentError = await paymentResponse.text();
+        console.error("Payment service error:", paymentError);
+        return NextResponse.json({
+          booking,
+          paymentUrl: null,
+          message:
+            "Booking received. We’ll contact you shortly to complete payment.",
+        });
+      }
+
+      const paymentData = await paymentResponse.json();
+
+      return NextResponse.json({
+        booking,
+        paymentUrl: paymentData.paymentUrl || paymentData.url || null,
+      });
+    } catch (paymentError) {
+      console.error("Payment service unreachable:", paymentError);
       return NextResponse.json({
         booking,
         paymentUrl: null,
         message:
-          "Booking created as pending. Payment service is not configured yet (Telebirr deferred).",
+          "Booking received. We’ll contact you shortly to complete payment.",
       });
     }
-
-    const paymentResponse = await fetch(`${paymentServiceUrl}/payments/start`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${paymentServiceSecret}`,
-      },
-      body: JSON.stringify({
-        bookingId: booking.id,
-        reference: booking.reference,
-        amount: booking.amount,
-        currency: "ETB",
-        customer: {
-          name: body.fullName,
-          email: body.email,
-          phone: body.phone,
-        },
-      }),
-    });
-
-    if (!paymentResponse.ok) {
-      const paymentError = await paymentResponse.text();
-      console.error("Payment service error:", paymentError);
-      return NextResponse.json(
-        {
-          booking,
-          paymentUrl: null,
-          error: "Booking saved but payment could not be started",
-        },
-        { status: 502 }
-      );
-    }
-
-    const paymentData = await paymentResponse.json();
-
-    return NextResponse.json({
-      booking,
-      paymentUrl: paymentData.paymentUrl || paymentData.url || null,
-    });
   } catch (error) {
     console.error("booking error:", error);
     return NextResponse.json(
-      { error: error.message || "Failed to create booking" },
+      {
+        error:
+          "We couldn’t submit your booking right now. Please try again in a moment.",
+      },
       { status: 500 }
     );
   }

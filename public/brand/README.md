@@ -1,13 +1,13 @@
 # Brand assets
 
-Put your logo files here:
+| File | Use |
+|------|-----|
+| `logo_have.png` | **Header** — horizontal mark on light backgrounds |
+| `logo_oval.png` | **Footer** — circular mark with white disc on navy |
+| `logo.png` | Alternate horizontal (dark plate) |
+| `logo_no_white.png` | Alternate stacked mark |
 
-- `logo.svg` (preferred) or `logo.png` — used in the site header
-- `logo-white.svg` or `logo-white.png` — optional light version for dark backgrounds (footer)
+`BrandLogo` picks assets via `variant`:
 
-Recommended: transparent SVG/PNG, roughly 160×40 or similar wide logo.
-
-After adding files, the header/footer will pick them up automatically from:
-
-- `/brand/logo.svg` (or `.png`)
-- `/brand/logo-white.svg` (or `.png`)
+- `variant="light"` → `/brand/logo_have.png`
+- `variant="dark"` → `/brand/logo_oval.png`

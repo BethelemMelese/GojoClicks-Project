@@ -38,7 +38,12 @@ export default function SectionHeading({
             />
           )}
           {subtitle && (
-            <p className="mt-3 max-w-xl font-body text-body-md text-neutral-gray">
+            <p
+              className={cn(
+                "mt-3 max-w-xl font-body text-body-md text-neutral-gray",
+                align === "center" && "mx-auto"
+              )}
+            >
               {subtitle}
             </p>
           )}

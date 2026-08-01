@@ -11,7 +11,7 @@ export const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/packages", label: "Packages" },
-  { href: "/services", label: "Services" },
+  // { href: "/services", label: "Services" },
   { href: "/contact", label: "Contact" },
 ];
 
@@ -19,9 +19,9 @@ export const FOOTER_COLUMNS = [
   {
     title: "Company",
     links: [
-      { href: "/how-it-works", label: "About Us" },
-      { href: "/how-it-works", label: "Case Studies" },
-      { href: "/how-it-works", label: "Careers" },
+      { href: "/about", label: "About Us" },
+      { href: "/about", label: "Case Studies" },
+      { href: "/contact", label: "Careers" },
     ],
   },
   {
@@ -35,23 +35,23 @@ export const FOOTER_COLUMNS = [
   {
     title: "Support",
     links: [
-      { href: "/how-it-works", label: "Contact Support" },
-      { href: "/how-it-works", label: "Privacy Policy" },
-      { href: "/how-it-works", label: "Terms of Service" },
+      { href: "/contact", label: "Contact Support" },
+      { href: "/about", label: "Privacy Policy" },
+      { href: "/about", label: "Terms of Service" },
     ],
   },
 ];
 
 export const FOOTER_LEGAL_LINKS = [
-  { href: "/how-it-works", label: "Advertising Guidelines" },
-  { href: "/how-it-works", label: "Cookie Policy" },
+  { href: "/about", label: "Advertising Guidelines" },
+  { href: "/about", label: "Cookie Policy" },
 ];
 
 export const HOME_STATS = [
-  { value: "500+", label: "Clients Managed" },
-  { value: "98%", label: "Retention Rate" },
-  { value: "$2B+", label: "Ad Spend Handled" },
-  { value: "15+", label: "Media Channels" },
+  { end: 500, suffix: "+", label: "Clients Managed" },
+  { end: 98, suffix: "%", label: "Retention Rate" },
+  { end: 2, prefix: "$", suffix: "B+", label: "Ad Spend Handled" },
+  { end: 15, suffix: "+", label: "Media Channels" },
 ];
 
 export const MEDIA_CHANNELS = [
