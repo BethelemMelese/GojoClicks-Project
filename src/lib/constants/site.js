@@ -11,33 +11,35 @@ export const NAV_LINKS = [
   { href: "/", label: "Home" },
   { href: "/about", label: "About Us" },
   { href: "/packages", label: "Packages" },
-  // { href: "/services", label: "Services" },
   { href: "/contact", label: "Contact" },
 ];
 
 export const FOOTER_COLUMNS = [
   {
     title: "Company",
+    interactive: true,
     links: [
       { href: "/about", label: "About Us" },
-      { href: "/about", label: "Case Studies" },
-      { href: "/contact", label: "Careers" },
+      { href: "/packages", label: "Packages" },
+      { href: "/contact", label: "Contact" },
     ],
   },
   {
     title: "Services",
+    interactive: false,
     links: [
-      { href: "/", label: "Marketplace" },
-      { href: "/packages", label: "Advertising Packages" },
-      { href: "/packages", label: "Partner Solutions" },
+      { label: "Property Ad Campaigns" },
+      { label: "Advertising Packages" },
+      { label: "Custom Campaigns" },
     ],
   },
   {
     title: "Support",
+    interactive: false,
     links: [
-      { href: "/contact", label: "Contact Support" },
-      { href: "/about", label: "Privacy Policy" },
-      { href: "/about", label: "Terms of Service" },
+      { label: "Contact Support" },
+      { label: "Privacy Policy" },
+      { label: "Terms of Service" },
     ],
   },
 ];
@@ -54,26 +56,29 @@ export const HOME_STATS = [
   { end: 15, suffix: "+", label: "Media Channels" },
 ];
 
-export const MEDIA_CHANNELS = [
+export const HOME_SERVICES = [
   {
-    title: "OOH & Billboard",
+    title: "Property Ad Campaigns",
     description:
-      "High-traffic placements across major metropolitan transit hubs.",
-    icon: "monitor",
-  },
-  {
-    title: "Programmatic Display",
-    description: "Precision targeting leveraging premium inventory.",
-    icon: "globe",
-  },
-  {
-    title: "Broadcast Media",
-    description: "Prime-time network placements and regional campaigns.",
+      "10-Day Facebook & Instagram campaigns built to sell apartments, villas, and new developments faster.",
     icon: "megaphone",
   },
   {
-    title: "Data Analytics",
-    description: "Real-time performance tracking and ROI reporting.",
+    title: "Audience Targeting",
+    description:
+      "Reach buyers, investors, and diaspora audiences by location, interests, and intent — not wasted impressions.",
+    icon: "globe",
+  },
+  {
+    title: "Creative & Content",
+    description:
+      "Scroll-stopping property creatives in Amharic, English, or both — ready to launch or crafted with you.",
+    icon: "monitor",
+  },
+  {
+    title: "Leads & Reporting",
+    description:
+      "WhatsApp and call leads delivered to your team, with daily optimization and clear performance reports.",
     icon: "chart",
   },
 ];

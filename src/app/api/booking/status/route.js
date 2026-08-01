@@ -1,14 +1,16 @@
 import { NextResponse } from "next/server";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
+// This route depends on per-request query params (?id= / ?ref=) — never static.
+export const dynamic = "force-dynamic";
+
 /**
  * Look up a booking by id or reference for confirmation / failed pages.
  */
 export async function GET(request) {
   try {
-    const { searchParams } = new URL(request.url);
-    const id = searchParams.get("id");
-    const ref = searchParams.get("ref");
+    const id = request.nextUrl.searchParams.get("id");
+    const ref = request.nextUrl.searchParams.get("ref");
 
     if (!id && !ref) {
       return NextResponse.json(

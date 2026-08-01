@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { generateUploadSignature } from "@/lib/cloudinary";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Returns a Cloudinary signed upload payload.
  * The browser uploads files directly to Cloudinary using this signature.

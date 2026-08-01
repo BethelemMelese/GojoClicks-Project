@@ -31,14 +31,19 @@ export default function StepConfirm({
       "Lead delivery",
       labelForOption(LEAD_DELIVERY_OPTIONS, form.leadDeliveryMethod),
     ],
-    ["Property type", labelForOption(PROPERTY_TYPE_OPTIONS, form.propertyType)],
-    ["Property location", form.propertyLocation],
-    ["Price range", form.priceRange],
-    ["Properties", form.propertyCount],
-    ["Target audience", form.targetAudience],
+    [
+      "Property type",
+      form.propertyType
+        ? labelForOption(PROPERTY_TYPE_OPTIONS, form.propertyType)
+        : "—",
+    ],
+    ["Property location", form.propertyLocation || "—"],
+    ["Target audience", form.targetAudience || "—"],
     [
       "Duration",
-      labelForOption(CAMPAIGN_DURATION_OPTIONS, form.campaignDuration),
+      form.campaignDuration === "custom"
+        ? form.customCampaignDuration || "Custom"
+        : labelForOption(CAMPAIGN_DURATION_OPTIONS, form.campaignDuration),
     ],
     ["Ad language", labelForOption(AD_LANGUAGE_OPTIONS, form.adLanguage)],
     [
@@ -47,20 +52,18 @@ export default function StepConfirm({
         .map((goal) => labelForOption(GOAL_OPTIONS, goal))
         .join(", "),
     ],
-    [
-      "Logo",
-      form.logoAsset?.name || (form.logoAsset?.url ? "Uploaded" : "—"),
-    ],
-    [
-      "Images",
-      Array.isArray(form.imageAssets) && form.imageAssets.length
-        ? form.imageAssets.map((item) => item.name || "image").join(", ")
-        : "—",
-    ],
-    [
-      "Video",
-      form.videoAsset?.name || (form.videoAsset?.url ? "Uploaded" : "—"),
-    ],
+    form.assetMediaType === "video"
+      ? [
+          "Video",
+          form.videoAsset?.name ||
+            (form.videoAsset?.url ? "Uploaded" : "—"),
+        ]
+      : [
+          "Images",
+          Array.isArray(form.imageAssets) && form.imageAssets.length
+            ? form.imageAssets.map((item) => item.name || "image").join(", ")
+            : "—",
+        ],
     ["External link", form.externalContentUrl || "—"],
   ];
 

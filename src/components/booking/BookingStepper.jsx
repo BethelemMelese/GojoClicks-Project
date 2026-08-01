@@ -21,7 +21,7 @@ import {
 export default function BookingStepper({ package: pkg }) {
   const router = useRouter();
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState(() => createInitialBookingForm(pkg));
+  const [form, setForm] = useState(() => createInitialBookingForm());
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -83,6 +83,7 @@ export default function BookingStepper({ package: pkg }) {
       ...(field === "logoAsset" ||
       field === "imageAssets" ||
       field === "videoAsset" ||
+      field === "assetMediaType" ||
       field === "externalContentUrl" ||
       field === "hasContentReady"
         ? { assets: undefined }

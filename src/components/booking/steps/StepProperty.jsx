@@ -10,40 +10,20 @@ export default function StepProperty({ form, errors, onChange }) {
   return (
     <div className="mt-6 space-y-6">
       <FormSection title="Property information">
+        <p className="font-body text-sm text-neutral-gray">
+          All fields on this step are optional — share what you know now.
+        </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <FormSelect
             id="propertyType"
             label="Property Type"
             value={form.propertyType}
             onChange={onChange("propertyType")}
-            options={PROPERTY_TYPE_OPTIONS}
+            options={[
+              { value: "", label: "Select (optional)" },
+              ...PROPERTY_TYPE_OPTIONS,
+            ]}
             error={errors.propertyType}
-          />
-          <Input
-            id="propertyCount"
-            label="Number of Properties"
-            type="number"
-            min="1"
-            value={form.propertyCount}
-            onChange={onChange("propertyCount")}
-            error={errors.propertyCount}
-          />
-          <Input
-            id="propertyLocation"
-            label="Property Location"
-            placeholder="Neighborhood / city"
-            value={form.propertyLocation}
-            onChange={onChange("propertyLocation")}
-            error={errors.propertyLocation}
-            className="sm:col-span-2"
-          />
-          <Input
-            id="priceRange"
-            label="Price Range"
-            placeholder="e.g. 3M – 8M ETB"
-            value={form.priceRange}
-            onChange={onChange("priceRange")}
-            error={errors.priceRange}
           />
           <FormSelect
             id="campaignDuration"
@@ -52,6 +32,26 @@ export default function StepProperty({ form, errors, onChange }) {
             onChange={onChange("campaignDuration")}
             options={CAMPAIGN_DURATION_OPTIONS}
             error={errors.campaignDuration}
+          />
+          {form.campaignDuration === "custom" ? (
+            <Input
+              id="customCampaignDuration"
+              label="Custom duration"
+              placeholder="e.g. 12 days, 3 weeks..."
+              value={form.customCampaignDuration}
+              onChange={onChange("customCampaignDuration")}
+              error={errors.customCampaignDuration}
+              className="sm:col-span-2"
+            />
+          ) : null}
+          <Input
+            id="propertyLocation"
+            label="Desired Location"
+            placeholder="Neighborhood / city"
+            value={form.propertyLocation}
+            onChange={onChange("propertyLocation")}
+            error={errors.propertyLocation}
+            className="sm:col-span-2"
           />
           <Input
             id="targetAudience"
