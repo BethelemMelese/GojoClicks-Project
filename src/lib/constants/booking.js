@@ -26,7 +26,7 @@ export const LEAD_DELIVERY_OPTIONS = [
   { value: "messenger", label: "Messenger" },
   { value: "instagram_dm", label: "Instagram DM" },
   { value: "email", label: "Email" },
-  { value: "dashboard", label: "Dashboard" },
+  { value: "dashboard", label: "GojoClicks Dashboard" },
 ];
 
 export const PROPERTY_TYPE_OPTIONS = [
@@ -40,16 +40,22 @@ export const PROPERTY_TYPE_OPTIONS = [
 ];
 
 export const CAMPAIGN_DURATION_OPTIONS = [
-  { value: "7_days", label: "7 days" },
+  { value: "10_days", label: "10 days" },
+  // { value: "7_days", label: "7 days" },
   { value: "15_days", label: "15 days" },
-  { value: "30_days", label: "30 days" },
-  { value: "60_days", label: "60 days" },
+  { value: "20_days", label: "20 days" },
+  { value: "40_days", label: "40 days" },
   { value: "custom", label: "Custom" },
 ];
 
 export const CONTENT_READY_OPTIONS = [
   { value: "yes", label: "Yes, content is ready" },
   { value: "needs_creation", label: "Need GojoClicks to create it" },
+];
+
+export const ASSET_MEDIA_OPTIONS = [
+  { value: "images", label: "Images" },
+  { value: "video", label: "Video" },
 ];
 
 export const AD_LANGUAGE_OPTIONS = [
@@ -66,16 +72,28 @@ export const GOAL_OPTIONS = [
   { value: "engagement", label: "Social engagement" },
 ];
 
-export function createInitialBookingForm(pkg) {
-  const duration = String(pkg?.duration || "").toLowerCase();
-  let campaignDuration = "15_days";
-  if (duration.includes("7")) campaignDuration = "7_days";
-  else if (duration.includes("30")) campaignDuration = "30_days";
-  else if (duration.includes("60")) campaignDuration = "60_days";
+/** Contact WhatsApp used for team follow-up. */
+export function resolvedWhatsappNumber(form) {
+  if (form.whatsappSameAsPhone !== false) {
+    return String(form.phone || "").trim();
+  }
+  return String(form.whatsappNumber || "").trim();
+}
 
+/** WhatsApp inbox for campaign leads (when delivery method is WhatsApp). */
+export function resolvedLeadsWhatsappNumber(form) {
+  if (form.leadDeliveryMethod !== "whatsapp") return null;
+  if (form.leadsWhatsappSameAsContact !== false) {
+    return resolvedWhatsappNumber(form) || null;
+  }
+  return String(form.leadsWhatsappNumber || "").trim() || null;
+}
+
+export function createInitialBookingForm() {
   return {
     fullName: "",
     phone: "",
+    whatsappSameAsPhone: true,
     whatsappNumber: "",
     email: "",
     companyName: "",
@@ -85,16 +103,18 @@ export function createInitialBookingForm(pkg) {
     instagramPageUrl: "",
     metaBusinessAccess: "not_sure",
     leadDeliveryMethod: "whatsapp",
+    leadsWhatsappSameAsContact: true,
     leadsWhatsappNumber: "",
-    propertyType: "apartment",
+    propertyType: "",
     propertyLocation: "",
-    priceRange: "",
-    propertyCount: "1",
     targetAudience: "",
     includeAdBudget: false,
     desiredAdBudget: "",
-    campaignDuration,
+    campaignDuration: "10_days",
+    customCampaignDuration: "",
     hasContentReady: "yes",
+    /** @type {"images" | "video"} */
+    assetMediaType: "images",
     externalContentUrl: "",
     adLanguage: "both",
     /** @type {{ url: string, name: string, size?: number } | null} */
@@ -128,12 +148,14 @@ export function validateBookingStep(step, form) {
   if (step === 1) {
     requireTrimmed(form.fullName, "Full name is required", errors, "fullName");
     requireTrimmed(form.phone, "Phone number is required", errors, "phone");
-    requireTrimmed(
-      form.whatsappNumber,
-      "WhatsApp number is required",
-      errors,
-      "whatsappNumber"
-    );
+    if (form.whatsappSameAsPhone === false) {
+      requireTrimmed(
+        form.whatsappNumber,
+        "WhatsApp number is required",
+        errors,
+        "whatsappNumber"
+      );
+    }
     requireTrimmed(form.email, "Email is required", errors, "email");
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       errors.email = "Enter a valid email";
@@ -156,33 +178,24 @@ export function validateBookingStep(step, form) {
     }
     if (
       form.leadDeliveryMethod === "whatsapp" &&
-      !form.leadsWhatsappNumber.trim()
+      form.leadsWhatsappSameAsContact === false
     ) {
-      errors.leadsWhatsappNumber = "WhatsApp number for leads is required";
+      requireTrimmed(
+        form.leadsWhatsappNumber,
+        "WhatsApp number for leads is required",
+        errors,
+        "leadsWhatsappNumber"
+      );
     }
   }
 
-  // 3 — Property & budget
+  // 3 — Property & budget (optional; custom duration needs a value when selected)
   if (step === 3) {
-    if (!form.propertyType) errors.propertyType = "Select a property type";
-    requireTrimmed(
-      form.propertyLocation,
-      "Property location is required",
-      errors,
-      "propertyLocation"
-    );
-    requireTrimmed(form.priceRange, "Price range is required", errors, "priceRange");
-    if (!form.propertyCount || Number(form.propertyCount) <= 0) {
-      errors.propertyCount = "Enter a valid property count";
-    }
-    requireTrimmed(
-      form.targetAudience,
-      "Target audience is required",
-      errors,
-      "targetAudience"
-    );
-    if (!form.campaignDuration) {
-      errors.campaignDuration = "Select campaign duration";
+    if (
+      form.campaignDuration === "custom" &&
+      !String(form.customCampaignDuration || "").trim()
+    ) {
+      errors.customCampaignDuration = "Enter your custom campaign duration";
     }
   }
 
@@ -197,15 +210,19 @@ export function validateBookingStep(step, form) {
     }
 
     if (form.hasContentReady === "yes") {
-      const hasUpload =
-        Boolean(assetUrl(form.logoAsset)) ||
-        Boolean(assetUrl(form.videoAsset)) ||
-        (Array.isArray(form.imageAssets) &&
-          form.imageAssets.some((item) => assetUrl(item)));
+      const hasImages =
+        Array.isArray(form.imageAssets) &&
+        form.imageAssets.some((item) => assetUrl(item));
+      const hasVideo = Boolean(assetUrl(form.videoAsset));
       const hasLink = Boolean(String(form.externalContentUrl || "").trim());
+      const mediaType = form.assetMediaType === "video" ? "video" : "images";
+      const hasUpload = mediaType === "video" ? hasVideo : hasImages;
+
       if (!hasUpload && !hasLink) {
         errors.assets =
-          "Upload at least one asset (logo, images, or video), or add an external link.";
+          mediaType === "video"
+            ? "Upload a video, or add an external link."
+            : "Upload at least one image, or add an external link.";
       }
     }
   }
@@ -230,7 +247,7 @@ export function buildBookingPayload(form, pkg) {
     packagePrice: pkg.price ?? null,
     fullName: form.fullName.trim(),
     phone: form.phone.trim(),
-    whatsappNumber: form.whatsappNumber.trim(),
+    whatsappNumber: resolvedWhatsappNumber(form),
     email: form.email.trim(),
     companyName: form.companyName.trim() || null,
     cityArea: form.cityArea.trim(),
@@ -239,15 +256,19 @@ export function buildBookingPayload(form, pkg) {
     instagramPageUrl: form.instagramPageUrl.trim() || null,
     metaBusinessAccess: form.metaBusinessAccess || null,
     leadDeliveryMethod: form.leadDeliveryMethod,
-    leadsWhatsappNumber: form.leadsWhatsappNumber.trim() || null,
-    propertyType: form.propertyType,
-    propertyLocation: form.propertyLocation.trim(),
-    priceRange: form.priceRange.trim(),
-    propertyCount: Number(form.propertyCount),
-    targetAudience: form.targetAudience.trim(),
+    leadsWhatsappNumber: resolvedLeadsWhatsappNumber(form),
+    propertyType: form.propertyType || null,
+    propertyLocation: form.propertyLocation.trim() || null,
+    priceRange: null,
+    propertyCount: null,
+    targetAudience: form.targetAudience.trim() || null,
     includeAdBudget: Boolean(form.includeAdBudget),
     desiredAdBudget: form.desiredAdBudget.trim() || null,
-    campaignDuration: form.campaignDuration,
+    campaignDuration: form.campaignDuration || "10_days",
+    customCampaignDuration:
+      form.campaignDuration === "custom"
+        ? form.customCampaignDuration.trim() || null
+        : null,
     hasContentReady: form.hasContentReady,
     externalContentUrl: form.externalContentUrl.trim() || null,
     adLanguage: form.adLanguage,

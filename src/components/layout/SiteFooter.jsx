@@ -55,12 +55,18 @@ export default function SiteFooter() {
                   <ul className="mt-4 space-y-3">
                     {column.links.map((link) => (
                       <li key={`${column.title}-${link.label}`}>
-                        <Link
-                          href={link.href}
-                          className="font-body text-sm text-white/75 transition duration-300 hover:text-gold"
-                        >
-                          {link.label}
-                        </Link>
+                        {column.interactive && link.href ? (
+                          <Link
+                            href={link.href}
+                            className="font-body text-sm text-white/75 transition duration-300 hover:text-gold"
+                          >
+                            {link.label}
+                          </Link>
+                        ) : (
+                          <span className="font-body text-sm text-white/55">
+                            {link.label}
+                          </span>
+                        )}
                       </li>
                     ))}
                   </ul>

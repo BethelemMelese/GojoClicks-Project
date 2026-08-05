@@ -48,10 +48,11 @@ create table if not exists public.bookings (
     ),
   leads_whatsapp_number text,
 
-  -- 4. Property Information
-  property_type text not null
+  -- 4. Property Information (optional)
+  property_type text
     check (
-      property_type in (
+      property_type is null
+      or property_type in (
         'apartment',
         'villa_house',
         'condominium',
@@ -61,24 +62,28 @@ create table if not exists public.bookings (
         'other'
       )
     ),
-  property_location text not null,
-  price_range text not null,
-  property_count integer not null check (property_count > 0),
-  target_audience text not null,
+  property_location text,
+  price_range text,
+  property_count integer check (property_count is null or property_count > 0),
+  target_audience text,
 
   -- 6. Budget & duration
   include_ad_budget boolean not null default false,
   desired_ad_budget text,
-  campaign_duration text not null
+  campaign_duration text not null default '10_days'
     check (
       campaign_duration in (
         '7_days',
+        '10_days',
         '15_days',
+        '20_days',
         '30_days',
+        '40_days',
         '60_days',
         'custom'
       )
     ),
+  custom_campaign_duration text,
 
   -- 7. Content Submission (+ Cloudinary uploads)
   has_content_ready text not null

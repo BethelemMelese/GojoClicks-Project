@@ -34,7 +34,7 @@ export default function PackageDetailHero({ package: pkg }) {
               <h1 className="font-display text-display-lg-mobile font-bold tracking-tight text-navy md:text-display-lg">
                 {pkg.title}{" "}
                 <span className="mt-1 block text-gold md:mt-0 md:inline">
-                  {pkg.duration?.replace(" Campaign", "") || "15-Day"} Edition
+                  {pkg.duration?.replace(" Campaign", "") || "10-Day"} Edition
                 </span>
               </h1>
             </div>

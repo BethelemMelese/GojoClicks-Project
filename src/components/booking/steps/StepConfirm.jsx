@@ -8,6 +8,8 @@ import {
   LEAD_DELIVERY_OPTIONS,
   PROPERTY_TYPE_OPTIONS,
   labelForOption,
+  resolvedLeadsWhatsappNumber,
+  resolvedWhatsappNumber,
 } from "@/lib/constants/booking";
 
 export default function StepConfirm({
@@ -17,13 +19,16 @@ export default function StepConfirm({
   onChange,
   submitError,
 }) {
+  const contactWhatsapp = resolvedWhatsappNumber(form);
+  const leadsWhatsapp = resolvedLeadsWhatsappNumber(form);
+
   const summary = [
     ["Package", pkg.title],
     ["Amount", formatEtb(pkg.price)],
     ["Name", form.fullName],
     ["Email", form.email],
     ["Phone", form.phone],
-    ["WhatsApp", form.whatsappNumber],
+    ["WhatsApp", contactWhatsapp || "—"],
     ["Company", form.companyName || "—"],
     ["City / Area", form.cityArea],
     ["Ad platform", labelForOption(AD_PLATFORM_OPTIONS, form.adPlatform)],
@@ -31,14 +36,23 @@ export default function StepConfirm({
       "Lead delivery",
       labelForOption(LEAD_DELIVERY_OPTIONS, form.leadDeliveryMethod),
     ],
-    ["Property type", labelForOption(PROPERTY_TYPE_OPTIONS, form.propertyType)],
-    ["Property location", form.propertyLocation],
-    ["Price range", form.priceRange],
-    ["Properties", form.propertyCount],
-    ["Target audience", form.targetAudience],
+    ...(form.leadDeliveryMethod === "whatsapp"
+      ? [["Leads WhatsApp", leadsWhatsapp || "—"]]
+      : []),
+
+    [
+      "Property type",
+      form.propertyType
+        ? labelForOption(PROPERTY_TYPE_OPTIONS, form.propertyType)
+        : "—",
+    ],
+    ["Property location", form.propertyLocation || "—"],
+    ["Target audience", form.targetAudience || "—"],
     [
       "Duration",
-      labelForOption(CAMPAIGN_DURATION_OPTIONS, form.campaignDuration),
+      form.campaignDuration === "custom"
+        ? form.customCampaignDuration || "Custom"
+        : labelForOption(CAMPAIGN_DURATION_OPTIONS, form.campaignDuration),
     ],
     ["Ad language", labelForOption(AD_LANGUAGE_OPTIONS, form.adLanguage)],
     [
@@ -47,20 +61,18 @@ export default function StepConfirm({
         .map((goal) => labelForOption(GOAL_OPTIONS, goal))
         .join(", "),
     ],
-    [
-      "Logo",
-      form.logoAsset?.name || (form.logoAsset?.url ? "Uploaded" : "—"),
-    ],
-    [
-      "Images",
-      Array.isArray(form.imageAssets) && form.imageAssets.length
-        ? form.imageAssets.map((item) => item.name || "image").join(", ")
-        : "—",
-    ],
-    [
-      "Video",
-      form.videoAsset?.name || (form.videoAsset?.url ? "Uploaded" : "—"),
-    ],
+    form.assetMediaType === "video"
+      ? [
+          "Video",
+          form.videoAsset?.name ||
+            (form.videoAsset?.url ? "Uploaded" : "—"),
+        ]
+      : [
+          "Images",
+          Array.isArray(form.imageAssets) && form.imageAssets.length
+            ? form.imageAssets.map((item) => item.name || "image").join(", ")
+            : "—",
+        ],
     ["External link", form.externalContentUrl || "—"],
   ];
 

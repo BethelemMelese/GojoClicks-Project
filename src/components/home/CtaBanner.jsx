@@ -26,7 +26,7 @@ export default function CtaBanner() {
               </p>
             </div>
             <Button href="/packages" variant="navy" className="shrink-0">
-              Book a Consultation
+              Get in touch
             </Button>
           </div>
         </Reveal>

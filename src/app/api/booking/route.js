@@ -1,5 +1,8 @@
 import { NextResponse } from "next/server";
+import { sendBookingNotification } from "@/lib/email/bookingNotification";
 import { createSupabaseServiceClient } from "@/lib/supabase";
+
+export const dynamic = "force-dynamic";
 
 const REQUIRED_FIELDS = [
   "packageId",
@@ -10,11 +13,6 @@ const REQUIRED_FIELDS = [
   "cityArea",
   "adPlatform",
   "leadDeliveryMethod",
-  "propertyType",
-  "propertyLocation",
-  "priceRange",
-  "propertyCount",
-  "targetAudience",
   "campaignDuration",
   "hasContentReady",
   "adLanguage",
@@ -56,15 +54,22 @@ export async function POST(request) {
       if (field === "termsAccepted") {
         return value !== true;
       }
-      if (field === "propertyCount") {
-        return value === undefined || value === null || Number(value) <= 0;
-      }
       return value === undefined || value === null || value === "";
     });
 
     if (missing.length > 0) {
       return NextResponse.json(
         { error: `Missing required fields: ${missing.join(", ")}` },
+        { status: 400 }
+      );
+    }
+
+    if (
+      body.campaignDuration === "custom" &&
+      !String(body.customCampaignDuration || "").trim()
+    ) {
+      return NextResponse.json(
+        { error: "Enter a custom campaign duration" },
         { status: 400 }
       );
     }
@@ -120,14 +125,21 @@ export async function POST(request) {
         meta_business_access: body.metaBusinessAccess || null,
         lead_delivery_method: body.leadDeliveryMethod,
         leads_whatsapp_number: body.leadsWhatsappNumber || null,
-        property_type: body.propertyType,
-        property_location: body.propertyLocation,
-        price_range: body.priceRange,
-        property_count: Number(body.propertyCount),
-        target_audience: body.targetAudience,
+        property_type: body.propertyType || null,
+        property_location: body.propertyLocation || null,
+        price_range: body.priceRange || null,
+        property_count:
+          body.propertyCount != null && body.propertyCount !== ""
+            ? Number(body.propertyCount)
+            : null,
+        target_audience: body.targetAudience || null,
         include_ad_budget: Boolean(body.includeAdBudget),
         desired_ad_budget: body.desiredAdBudget || null,
-        campaign_duration: body.campaignDuration,
+        campaign_duration: body.campaignDuration || "10_days",
+        custom_campaign_duration:
+          body.campaignDuration === "custom"
+            ? body.customCampaignDuration || null
+            : null,
         has_content_ready: body.hasContentReady,
         external_content_url: body.externalContentUrl || null,
         ad_language: body.adLanguage,
@@ -149,6 +161,9 @@ export async function POST(request) {
         { status: 500 }
       );
     }
+
+    // Notify team by email; failures must not fail the booking.
+    await sendBookingNotification(booking);
 
     const paymentServiceUrl = process.env.PAYMENT_SERVICE_URL;
     const paymentServiceSecret = process.env.PAYMENT_SERVICE_SECRET;

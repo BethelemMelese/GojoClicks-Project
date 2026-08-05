@@ -73,6 +73,16 @@ Allowed values worth knowing:
 | `has_content_ready` | `yes`, `needs_creation` |
 | `ad_language` | `amharic`, `english`, `both` |
 
+## Booking email alerts
+
+After a booking is saved to Supabase, the API sends a notification via [Resend](https://resend.com) to `BOOKING_NOTIFY_TO` (default: `melesebety2673@gmail.com`). Email failures never block booking creation.
+
+1. Create a Resend account and API key
+2. Add `RESEND_API_KEY`, `BOOKING_NOTIFY_TO`, and `EMAIL_FROM` to `.env.local` (see `.env.example`)
+3. For production, verify your domain in Resend and set `EMAIL_FROM` to that domain (testing can use `onboarding@resend.dev`)
+
+**Email logo:** `public/brand/logo.png` — embedded inline (CID) in [`src/lib/email/bookingNotification.js`](./src/lib/email/bookingNotification.js), so it works even on localhost.
+
 ## Environment
 
 See `.env.example`. Never commit `.env` or `.env.local`.

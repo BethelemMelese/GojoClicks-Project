@@ -62,14 +62,42 @@ export default function StepPlatform({ form, errors, onChange, onFieldChange }) 
           error={errors.leadDeliveryMethod}
         />
         {form.leadDeliveryMethod === "whatsapp" ? (
-          <Input
-            id="leadsWhatsappNumber"
-            label="WhatsApp number for leads"
-            placeholder="+251..."
-            value={form.leadsWhatsappNumber}
-            onChange={onChange("leadsWhatsappNumber")}
-            error={errors.leadsWhatsappNumber}
-          />
+          <div className="space-y-4">
+            <label className="flex items-start gap-3 rounded-lg border border-border-soft p-4">
+              <input
+                type="checkbox"
+                checked={form.leadsWhatsappSameAsContact !== false}
+                onChange={onChange("leadsWhatsappSameAsContact")}
+                className="mt-1 accent-gold"
+              />
+              <span className="font-body text-sm text-on-surface-variant">
+                Send leads to my WhatsApp contact number
+              </span>
+            </label>
+            {form.leadsWhatsappSameAsContact === false ? (
+              <Input
+                id="leadsWhatsappNumber"
+                label="WhatsApp number for leads"
+                placeholder="+251..."
+                value={form.leadsWhatsappNumber}
+                onChange={onChange("leadsWhatsappNumber")}
+                error={errors.leadsWhatsappNumber}
+              />
+            ) : null}
+          </div>
+        ) : null}
+        {form.leadDeliveryMethod === "dashboard" ? (
+          <div className="rounded-lg border border-gold/30 bg-[#fff8eb] p-4">
+            <p className="font-display text-sm font-semibold text-navy">
+              GojoClicks Dashboard
+            </p>
+            <p className="mt-1.5 font-body text-sm leading-6 text-on-surface-variant">
+              Leads will be collected and organized in your GojoClicks client
+              dashboard — a secure online space where you can review inquiries,
+              contact details, and campaign activity. We&apos;ll share access
+              details with you after booking confirmation.
+            </p>
+          </div>
         ) : null}
       </FormSection>
     </div>

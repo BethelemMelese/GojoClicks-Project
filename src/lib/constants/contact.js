@@ -6,13 +6,13 @@ export const CONTACT_HERO = {
 };
 
 export const CONTACT_DETAILS = [
-  {
-    id: "hq",
-    icon: "map",
-    title: "Addis Headquarters",
-    body: "Bole, Addis Ababa, Ethiopia",
-    href: null,
-  },
+  // {
+  //   id: "hq",
+  //   icon: "map",
+  //   title: "Addis Headquarters",
+  //   body: "Bole, Addis Ababa, Ethiopia",
+  //   href: null,
+  // },
   {
     id: "email",
     icon: "mail",

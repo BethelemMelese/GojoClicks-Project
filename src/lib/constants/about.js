@@ -10,7 +10,7 @@ export const METHODOLOGY_STEPS = [
     number: "01",
     label: "Discovery",
     title: "Explore Packages",
-    body: "Browse curated 15-day campaigns designed around reach, views, and WhatsApp lead goals.",
+    body: "Browse curated 10-Day campaigns designed around reach, views, and WhatsApp lead goals.",
     icon: "globe",
   },
   {
@@ -43,8 +43,8 @@ export const ABOUT_OVERVIEW = {
     "From boutique agencies to large developers, our process keeps stakeholders aligned while campaigns stay sharp across Facebook, Instagram, and high-intent audiences.",
   ],
   image:
-    "https://images.unsplash.com/photo-1600880292203-757bb62b4baf?auto=format&fit=crop&w=1400&q=80",
-  imageAlt: "Team collaborating in a modern boardroom",
+    "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1400&q=80",
+  imageAlt: "Contemporary residential property with landscaped entrance",
   stats: [
     { value: "500+", label: "Partnerships" },
     { value: "$1.2B", label: "Managed Ad Spend" },
