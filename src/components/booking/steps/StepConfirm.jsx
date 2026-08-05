@@ -8,6 +8,8 @@ import {
   LEAD_DELIVERY_OPTIONS,
   PROPERTY_TYPE_OPTIONS,
   labelForOption,
+  resolvedLeadsWhatsappNumber,
+  resolvedWhatsappNumber,
 } from "@/lib/constants/booking";
 
 export default function StepConfirm({
@@ -17,13 +19,16 @@ export default function StepConfirm({
   onChange,
   submitError,
 }) {
+  const contactWhatsapp = resolvedWhatsappNumber(form);
+  const leadsWhatsapp = resolvedLeadsWhatsappNumber(form);
+
   const summary = [
     ["Package", pkg.title],
     ["Amount", formatEtb(pkg.price)],
     ["Name", form.fullName],
     ["Email", form.email],
     ["Phone", form.phone],
-    ["WhatsApp", form.whatsappNumber],
+    ["WhatsApp", contactWhatsapp || "—"],
     ["Company", form.companyName || "—"],
     ["City / Area", form.cityArea],
     ["Ad platform", labelForOption(AD_PLATFORM_OPTIONS, form.adPlatform)],
@@ -31,6 +36,10 @@ export default function StepConfirm({
       "Lead delivery",
       labelForOption(LEAD_DELIVERY_OPTIONS, form.leadDeliveryMethod),
     ],
+    ...(form.leadDeliveryMethod === "whatsapp"
+      ? [["Leads WhatsApp", leadsWhatsapp || "—"]]
+      : []),
+
     [
       "Property type",
       form.propertyType

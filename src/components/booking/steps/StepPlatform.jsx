@@ -62,14 +62,29 @@ export default function StepPlatform({ form, errors, onChange, onFieldChange }) 
           error={errors.leadDeliveryMethod}
         />
         {form.leadDeliveryMethod === "whatsapp" ? (
-          <Input
-            id="leadsWhatsappNumber"
-            label="WhatsApp number for leads"
-            placeholder="+251..."
-            value={form.leadsWhatsappNumber}
-            onChange={onChange("leadsWhatsappNumber")}
-            error={errors.leadsWhatsappNumber}
-          />
+          <div className="space-y-4">
+            <label className="flex items-start gap-3 rounded-lg border border-border-soft p-4">
+              <input
+                type="checkbox"
+                checked={form.leadsWhatsappSameAsContact !== false}
+                onChange={onChange("leadsWhatsappSameAsContact")}
+                className="mt-1 accent-gold"
+              />
+              <span className="font-body text-sm text-on-surface-variant">
+                Send leads to my WhatsApp contact number
+              </span>
+            </label>
+            {form.leadsWhatsappSameAsContact === false ? (
+              <Input
+                id="leadsWhatsappNumber"
+                label="WhatsApp number for leads"
+                placeholder="+251..."
+                value={form.leadsWhatsappNumber}
+                onChange={onChange("leadsWhatsappNumber")}
+                error={errors.leadsWhatsappNumber}
+              />
+            ) : null}
+          </div>
         ) : null}
         {form.leadDeliveryMethod === "dashboard" ? (
           <div className="rounded-lg border border-gold/30 bg-[#fff8eb] p-4">

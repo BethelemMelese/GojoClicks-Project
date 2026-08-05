@@ -76,7 +76,9 @@ create table if not exists public.bookings (
         '7_days',
         '10_days',
         '15_days',
+        '20_days',
         '30_days',
+        '40_days',
         '60_days',
         'custom'
       )

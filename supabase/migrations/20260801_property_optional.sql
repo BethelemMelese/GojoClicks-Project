@@ -33,7 +33,9 @@ alter table public.bookings add constraint bookings_campaign_duration_check
       '7_days',
       '10_days',
       '15_days',
+      '20_days',
       '30_days',
+      '40_days',
       '60_days',
       'custom'
     )

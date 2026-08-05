@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sendBookingNotification } from "@/lib/email/bookingNotification";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -160,6 +161,9 @@ export async function POST(request) {
         { status: 500 }
       );
     }
+
+    // Notify team by email; failures must not fail the booking.
+    await sendBookingNotification(booking);
 
     const paymentServiceUrl = process.env.PAYMENT_SERVICE_URL;
     const paymentServiceSecret = process.env.PAYMENT_SERVICE_SECRET;

@@ -72,10 +72,28 @@ export const GOAL_OPTIONS = [
   { value: "engagement", label: "Social engagement" },
 ];
 
+/** Contact WhatsApp used for team follow-up. */
+export function resolvedWhatsappNumber(form) {
+  if (form.whatsappSameAsPhone !== false) {
+    return String(form.phone || "").trim();
+  }
+  return String(form.whatsappNumber || "").trim();
+}
+
+/** WhatsApp inbox for campaign leads (when delivery method is WhatsApp). */
+export function resolvedLeadsWhatsappNumber(form) {
+  if (form.leadDeliveryMethod !== "whatsapp") return null;
+  if (form.leadsWhatsappSameAsContact !== false) {
+    return resolvedWhatsappNumber(form) || null;
+  }
+  return String(form.leadsWhatsappNumber || "").trim() || null;
+}
+
 export function createInitialBookingForm() {
   return {
     fullName: "",
     phone: "",
+    whatsappSameAsPhone: true,
     whatsappNumber: "",
     email: "",
     companyName: "",
@@ -85,6 +103,7 @@ export function createInitialBookingForm() {
     instagramPageUrl: "",
     metaBusinessAccess: "not_sure",
     leadDeliveryMethod: "whatsapp",
+    leadsWhatsappSameAsContact: true,
     leadsWhatsappNumber: "",
     propertyType: "",
     propertyLocation: "",
@@ -129,12 +148,14 @@ export function validateBookingStep(step, form) {
   if (step === 1) {
     requireTrimmed(form.fullName, "Full name is required", errors, "fullName");
     requireTrimmed(form.phone, "Phone number is required", errors, "phone");
-    requireTrimmed(
-      form.whatsappNumber,
-      "WhatsApp number is required",
-      errors,
-      "whatsappNumber"
-    );
+    if (form.whatsappSameAsPhone === false) {
+      requireTrimmed(
+        form.whatsappNumber,
+        "WhatsApp number is required",
+        errors,
+        "whatsappNumber"
+      );
+    }
     requireTrimmed(form.email, "Email is required", errors, "email");
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
       errors.email = "Enter a valid email";
@@ -157,9 +178,14 @@ export function validateBookingStep(step, form) {
     }
     if (
       form.leadDeliveryMethod === "whatsapp" &&
-      !form.leadsWhatsappNumber.trim()
+      form.leadsWhatsappSameAsContact === false
     ) {
-      errors.leadsWhatsappNumber = "WhatsApp number for leads is required";
+      requireTrimmed(
+        form.leadsWhatsappNumber,
+        "WhatsApp number for leads is required",
+        errors,
+        "leadsWhatsappNumber"
+      );
     }
   }
 
@@ -221,7 +247,7 @@ export function buildBookingPayload(form, pkg) {
     packagePrice: pkg.price ?? null,
     fullName: form.fullName.trim(),
     phone: form.phone.trim(),
-    whatsappNumber: form.whatsappNumber.trim(),
+    whatsappNumber: resolvedWhatsappNumber(form),
     email: form.email.trim(),
     companyName: form.companyName.trim() || null,
     cityArea: form.cityArea.trim(),
@@ -230,7 +256,7 @@ export function buildBookingPayload(form, pkg) {
     instagramPageUrl: form.instagramPageUrl.trim() || null,
     metaBusinessAccess: form.metaBusinessAccess || null,
     leadDeliveryMethod: form.leadDeliveryMethod,
-    leadsWhatsappNumber: form.leadsWhatsappNumber.trim() || null,
+    leadsWhatsappNumber: resolvedLeadsWhatsappNumber(form),
     propertyType: form.propertyType || null,
     propertyLocation: form.propertyLocation.trim() || null,
     priceRange: null,
