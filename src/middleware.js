@@ -1,23 +1,20 @@
 import { NextResponse } from "next/server";
+import { verifyAdminSessionToken } from "@/lib/adminAuth";
 
 const ADMIN_COOKIE = "gc_admin_session";
 
-function isAuthed(request) {
-  const token = request.cookies.get(ADMIN_COOKIE)?.value;
-  const expected =
-    process.env.ADMIN_SESSION_SECRET || process.env.ADMIN_PASSWORD || "";
-  return Boolean(token && expected && token === expected);
-}
-
-export function middleware(request) {
+export async function middleware(request) {
   const { pathname } = request.nextUrl;
 
   if (!pathname.startsWith("/admin")) {
     return NextResponse.next();
   }
 
+  const token = request.cookies.get(ADMIN_COOKIE)?.value;
+  const authed = await verifyAdminSessionToken(token);
+
   if (pathname === "/admin/login") {
-    if (isAuthed(request)) {
+    if (authed) {
       return NextResponse.redirect(new URL("/admin/bookings", request.url));
     }
     return NextResponse.next();
@@ -30,7 +27,7 @@ export function middleware(request) {
     return NextResponse.redirect(url);
   }
 
-  if (!isAuthed(request)) {
+  if (!authed) {
     const url = request.nextUrl.clone();
     url.pathname = "/admin/login";
     url.searchParams.set("next", pathname);

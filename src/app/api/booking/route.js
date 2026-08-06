@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sendBookingEmails } from "@/lib/email/bookingNotification";
+import { enforceRateLimit } from "@/lib/rateLimit";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -27,6 +28,9 @@ const REQUIRED_FIELDS = [
  * Clients pay first and submit a transaction ID + receipt proof for manual verification.
  */
 export async function POST(request) {
+  const limited = await enforceRateLimit(request, "booking");
+  if (limited) return limited;
+
   try {
     const body = await request.json();
 

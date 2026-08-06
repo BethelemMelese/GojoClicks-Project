@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Button from "@/components/ui/Button";
 import FormSelect from "@/components/ui/FormSelect";
 
@@ -19,6 +19,10 @@ export default function BookingStatusForm({ bookingId, initialStatus }) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
+  useEffect(() => {
+    setStatus(initialStatus || "pending");
+  }, [initialStatus]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     setBusy(true);
@@ -29,14 +33,35 @@ export default function BookingStatusForm({ bookingId, initialStatus }) {
       const response = await fetch(`/api/admin/bookings/${bookingId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        cache: "no-store",
         body: JSON.stringify({ status }),
       });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || "Update failed");
       }
-      setMessage("Status updated.");
+
+      const saved = data.booking?.status;
+      if (saved && saved !== status) {
+        throw new Error(
+          `Server returned status “${saved}” instead of “${status}”.`
+        );
+      }
+
+      setMessage(
+        data.email?.ok === false
+          ? `Status updated to ${saved || status}, but the customer email failed.`
+          : data.unchanged
+            ? `Status is already ${saved || status}.`
+            : `Status updated to ${saved || status}. Customer notified.`
+      );
+      setStatus(saved || status);
       router.refresh();
+      // Return to list so it refetches fresh data (avoids stale cached table)
+      window.setTimeout(() => {
+        router.push("/admin/bookings");
+      }, 600);
     } catch (err) {
       setError(err.message || "Update failed");
     } finally {

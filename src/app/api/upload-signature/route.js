@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { generateUploadSignature } from "@/lib/cloudinary";
+import { enforceRateLimit } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
@@ -8,6 +9,9 @@ export const dynamic = "force-dynamic";
  * The browser uploads files directly to Cloudinary using this signature.
  */
 export async function POST(request) {
+  const limited = await enforceRateLimit(request, "upload-signature");
+  if (limited) return limited;
+
   try {
     const body = await request.json().catch(() => ({}));
     const signaturePayload = generateUploadSignature({

@@ -9,6 +9,7 @@ import { INTEREST_AREA_OPTIONS } from "@/lib/constants/contact";
 
 const INITIAL = {
   fullName: "",
+  email: "",
   company: "",
   interestArea: "packages",
   vision: "",
@@ -19,15 +20,21 @@ export default function ConsultationForm() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState("");
 
   const onChange = (field) => (event) => {
     setForm((prev) => ({ ...prev, [field]: event.target.value }));
     setErrors((prev) => ({ ...prev, [field]: undefined }));
+    setSubmitError("");
   };
 
   const validate = () => {
     const next = {};
     if (!form.fullName.trim()) next.fullName = "Full name is required";
+    if (!form.email.trim()) next.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      next.email = "Enter a valid email";
+    }
     if (!form.interestArea) next.interestArea = "Select an interest area";
     if (!form.vision.trim()) next.vision = "Tell us a bit about your project";
     return next;
@@ -40,10 +47,33 @@ export default function ConsultationForm() {
     if (Object.keys(next).length) return;
 
     setSubmitting(true);
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    setSubmitting(false);
-    setSubmitted(true);
-    setForm(INITIAL);
+    setSubmitError("");
+
+    try {
+      const response = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          fullName: form.fullName.trim(),
+          email: form.email.trim(),
+          company: form.company.trim(),
+          interestArea: form.interestArea,
+          vision: form.vision.trim(),
+        }),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to send request");
+      }
+      setSubmitted(true);
+      setForm(INITIAL);
+    } catch (error) {
+      setSubmitError(
+        error.message || "Something went wrong. Please try again."
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (submitted) {
@@ -89,11 +119,21 @@ export default function ConsultationForm() {
           error={errors.fullName}
         />
         <Input
+          id="email"
+          label="Email"
+          type="email"
+          placeholder="name@example.com"
+          value={form.email}
+          onChange={onChange("email")}
+          error={errors.email}
+        />
+        <Input
           id="company"
           label="Company"
           placeholder="Agency or company"
           value={form.company}
           onChange={onChange("company")}
+          className="sm:col-span-2"
         />
         <FormSelect
           id="interestArea"
@@ -115,6 +155,12 @@ export default function ConsultationForm() {
           rows={5}
         />
       </div>
+
+      {submitError ? (
+        <p className="mt-4 rounded-lg border border-error/30 bg-error/5 px-4 py-3 font-body text-sm text-error">
+          {submitError}
+        </p>
+      ) : null}
 
       <Button type="submit" className="mt-6 w-full" disabled={submitting}>
         {submitting ? "Submitting..." : "Submit Request"}

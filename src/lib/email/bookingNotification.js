@@ -502,6 +502,197 @@ export async function sendCustomerBookingConfirmation(booking) {
   }
 }
 
+function statusCopy(status) {
+  switch (status) {
+    case "paid":
+      return {
+        eyebrow: "Payment verified",
+        title: "Your payment was verified",
+        body: "Great news — we verified your payment. Our team will begin preparing your campaign and contact you with next steps shortly.",
+      };
+    case "failed":
+      return {
+        eyebrow: "Payment update",
+        title: "We could not verify your payment",
+        body: "We were unable to verify the payment details submitted with your booking. Please reply to this email with a clearer transaction ID or receipt, or contact our team for help.",
+      };
+    case "cancelled":
+      return {
+        eyebrow: "Booking cancelled",
+        title: "Your booking was cancelled",
+        body: "Your booking has been cancelled. If this was unexpected or you need to rebook, reply to this email and our team will help.",
+      };
+    case "pending":
+    default:
+      return {
+        eyebrow: "Booking update",
+        title: "Your booking is under review",
+        body: "Your booking status is pending while our team reviews your payment and details. We will update you again soon.",
+      };
+  }
+}
+
+function statusLabel(status) {
+  switch (status) {
+    case "paid":
+      return "Paid (verified)";
+    case "failed":
+      return "Failed / invalid payment";
+    case "cancelled":
+      return "Cancelled";
+    case "pending":
+      return "Pending";
+    default:
+      return status || "Updated";
+  }
+}
+
+function statusEmailSubject(booking) {
+  const status = booking.status;
+  if (status === "paid") {
+    return `Payment verified — ${booking.reference}`;
+  }
+  if (status === "failed") {
+    return `Payment could not be verified — ${booking.reference}`;
+  }
+  if (status === "cancelled") {
+    return `Booking cancelled — ${booking.reference}`;
+  }
+  return `Booking update — ${booking.reference}`;
+}
+
+function buildCustomerStatusEmailHtml(booking, previousStatus) {
+  const amount = formatAmount(booking.amount);
+  const copy = statusCopy(booking.status);
+  const firstName =
+    String(booking.full_name || "")
+      .trim()
+      .split(/\s+/)[0] || "there";
+  const confirmationUrl = `${siteOrigin()}/booking/confirmation?ref=${encodeURIComponent(booking.reference || "")}`;
+
+  const bodyHtml = `
+    <p style="margin:0 0 18px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#45474d;">
+      Hi <strong style="color:#0d1b33;">${escapeHtml(firstName)}</strong>,
+    </p>
+    <p style="margin:0 0 22px;font-family:Arial,Helvetica,sans-serif;font-size:15px;line-height:1.55;color:#45474d;">
+      ${escapeHtml(copy.body)}
+    </p>
+    <p style="margin:0 0 10px;font-family:Arial,Helvetica,sans-serif;font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:#e8a93b;">
+      Status
+    </p>
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:8px;">
+      ${detailRow("Reference", booking.reference)}
+      ${
+        previousStatus && previousStatus !== booking.status
+          ? detailRow("Previous status", statusLabel(previousStatus))
+          : ""
+      }
+      ${detailRow("New status", statusLabel(booking.status))}
+      ${detailRow("Package", packageLabel(booking))}
+      ${detailRow("Amount", amount)}
+      ${detailRow("Transaction ID", booking.payment_transaction_id)}
+    </table>
+    <p style="margin:22px 0 0;">
+      <a href="${escapeHtml(confirmationUrl)}" style="display:inline-block;background:#e8a93b;color:#0d1b33;font-family:Arial,Helvetica,sans-serif;font-size:13px;font-weight:700;text-decoration:none;padding:12px 18px;border-radius:8px;">
+        View booking
+      </a>
+    </p>
+    <p style="margin:16px 0 0;font-family:Arial,Helvetica,sans-serif;font-size:13px;line-height:1.5;color:#6b7280;">
+      Reply to this email if you have any questions.
+    </p>
+  `;
+
+  return emailShell({
+    eyebrow: copy.eyebrow,
+    title: copy.title,
+    referenceStrip: referenceStripHtml(booking, amount),
+    bodyHtml,
+    footerNote: "Reply to this email if you need help from our team.",
+  });
+}
+
+function buildCustomerStatusEmailText(booking, previousStatus) {
+  const amount = formatAmount(booking.amount);
+  const copy = statusCopy(booking.status);
+  const firstName =
+    String(booking.full_name || "")
+      .trim()
+      .split(/\s+/)[0] || "there";
+  const confirmationUrl = `${siteOrigin()}/booking/confirmation?ref=${encodeURIComponent(booking.reference || "")}`;
+
+  return [
+    `Hi ${firstName},`,
+    "",
+    copy.body,
+    "",
+    `Reference: ${booking.reference}`,
+    previousStatus && previousStatus !== booking.status
+      ? `Previous status: ${statusLabel(previousStatus)}`
+      : null,
+    `New status: ${statusLabel(booking.status)}`,
+    `Package: ${packageLabel(booking)}${amount ? ` · ${amount}` : ""}`,
+    `Transaction ID: ${booking.payment_transaction_id || "—"}`,
+    "",
+    `View booking: ${confirmationUrl}`,
+    "",
+    "Reply to this email if you need help.",
+  ]
+    .filter(Boolean)
+    .join("\n");
+}
+
+/**
+ * Notify the customer when admin changes payment/booking status. Never throws.
+ */
+export async function sendCustomerStatusUpdateEmail(booking, previousStatus) {
+  const resend = getResendClient();
+  if (!resend) {
+    console.warn(
+      "RESEND_API_KEY is not set — skipping customer status update email."
+    );
+    return { skipped: true };
+  }
+
+  const to = String(booking.email || "").trim();
+  if (!to) {
+    console.warn("Booking has no customer email — skipping status email.");
+    return { skipped: true };
+  }
+
+  if (previousStatus && previousStatus === booking.status) {
+    return { skipped: true, reason: "unchanged" };
+  }
+
+  const from = getFromAddress();
+  const teamInbox = getTeamNotifyTo();
+
+  try {
+    const logo = loadLogoAttachment();
+    const { data, error } = await resend.emails.send({
+      from,
+      to: [to],
+      replyTo: teamInbox || undefined,
+      subject: statusEmailSubject(booking),
+      html: buildCustomerStatusEmailHtml(booking, previousStatus),
+      text: buildCustomerStatusEmailText(booking, previousStatus),
+      ...(logo ? { attachments: [logo] } : {}),
+    });
+
+    if (error) {
+      console.error("Resend customer status email error:", error);
+      return { ok: false, error };
+    }
+
+    console.log(
+      `Customer status email (${booking.status}) sent to ${to} (id: ${data?.id || "n/a"})`
+    );
+    return { ok: true, id: data?.id };
+  } catch (error) {
+    console.error("Resend customer status email failed:", error);
+    return { ok: false, error };
+  }
+}
+
 /**
  * Send team alert + customer confirmation. Failures never block booking creation.
  */

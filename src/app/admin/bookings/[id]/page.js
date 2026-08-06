@@ -10,20 +10,21 @@ import {
   CONTENT_READY_OPTIONS,
   GOAL_OPTIONS,
   LEAD_DELIVERY_OPTIONS,
+  META_ACCESS_OPTIONS,
   PROPERTY_TYPE_OPTIONS,
   labelForOption,
 } from "@/lib/constants/booking";
 
 export const dynamic = "force-dynamic";
 
-function Row({ label, value, href }) {
+function Row({ label, value, href, full }) {
   if (value == null || value === "") return null;
   return (
-    <div>
+    <div className={full ? "sm:col-span-2" : undefined}>
       <dt className="font-body text-[11px] font-bold uppercase tracking-[0.08em] text-neutral-gray">
         {label}
       </dt>
-      <dd className="mt-1 font-body text-sm text-navy">
+      <dd className="mt-1 whitespace-pre-wrap break-words font-body text-sm text-navy">
         {href ? (
           <a
             href={href}
@@ -34,11 +35,30 @@ function Row({ label, value, href }) {
             {value}
           </a>
         ) : (
-          value
+          String(value)
         )}
       </dd>
     </div>
   );
+}
+
+function yesNo(value) {
+  if (value === true) return "Yes";
+  if (value === false) return "No";
+  return null;
+}
+
+function parseImageUrls(value) {
+  if (Array.isArray(value)) return value.filter(Boolean);
+  if (typeof value === "string") {
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed.filter(Boolean) : [];
+    } catch {
+      return value ? [value] : [];
+    }
+  }
+  return [];
 }
 
 export default async function AdminBookingDetailPage({ params }) {
@@ -58,9 +78,11 @@ export default async function AdminBookingDetailPage({ params }) {
 
   const goals = Array.isArray(booking.goals)
     ? booking.goals.map((g) => labelForOption(GOAL_OPTIONS, g)).join(", ")
-    : "—";
+    : booking.goals
+      ? String(booking.goals)
+      : null;
 
-  const imageUrls = Array.isArray(booking.image_urls) ? booking.image_urls : [];
+  const imageUrls = parseImageUrls(booking.image_urls);
 
   return (
     <div>
@@ -95,9 +117,32 @@ export default async function AdminBookingDetailPage({ params }) {
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
         <section className="rounded-lg border border-border-soft bg-white p-5 shadow-elev1">
           <h2 className="font-display text-sm font-semibold text-navy">
+            Package
+          </h2>
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Row label="Title" value={booking.package_title} />
+            <Row
+              label="Amount"
+              value={
+                booking.amount != null ? formatEtb(booking.amount) : null
+              }
+            />
+            <Row label="Package ID" value={booking.package_id} />
+            <Row label="Slug" value={booking.package_slug} />
+            <Row label="Created" value={booking.created_at
+              ? new Date(booking.created_at).toLocaleString()
+              : null} />
+            <Row label="Updated" value={booking.updated_at
+              ? new Date(booking.updated_at).toLocaleString()
+              : null} />
+          </dl>
+        </section>
+
+        <section className="rounded-lg border border-border-soft bg-white p-5 shadow-elev1">
+          <h2 className="font-display text-sm font-semibold text-navy">
             Payment
           </h2>
-          <dl className="mt-4 grid gap-3">
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             <Row label="Status" value={booking.status} />
             <Row
               label="Transaction ID"
@@ -107,10 +152,11 @@ export default async function AdminBookingDetailPage({ params }) {
               label="Payment proof"
               value={booking.payment_proof_url ? "Open receipt" : null}
               href={booking.payment_proof_url || undefined}
+              full
             />
             {booking.payment_proof_url &&
             !/\.pdf($|\?)/i.test(booking.payment_proof_url) ? (
-              <div>
+              <div className="sm:col-span-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={booking.payment_proof_url}
@@ -127,23 +173,46 @@ export default async function AdminBookingDetailPage({ params }) {
             Client
           </h2>
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
-            <Row label="Name" value={booking.full_name} />
+            <Row label="Full name" value={booking.full_name} />
             <Row label="Phone" value={booking.phone} />
             <Row label="WhatsApp" value={booking.whatsapp_number} />
             <Row label="Email" value={booking.email} />
             <Row label="Company" value={booking.company_name} />
-            <Row label="City" value={booking.city_area} />
+            <Row label="City / area" value={booking.city_area} />
           </dl>
         </section>
 
         <section className="rounded-lg border border-border-soft bg-white p-5 shadow-elev1">
           <h2 className="font-display text-sm font-semibold text-navy">
-            Campaign
+            Platform & leads
           </h2>
           <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             <Row
-              label="Platform"
+              label="Ad platform"
               value={labelForOption(AD_PLATFORM_OPTIONS, booking.ad_platform)}
+            />
+            <Row
+              label="Meta Business access"
+              value={
+                booking.meta_business_access
+                  ? labelForOption(
+                      META_ACCESS_OPTIONS,
+                      booking.meta_business_access
+                    )
+                  : null
+              }
+            />
+            <Row
+              label="Facebook page"
+              value={booking.facebook_page_url}
+              href={booking.facebook_page_url || undefined}
+              full
+            />
+            <Row
+              label="Instagram page"
+              value={booking.instagram_page_url}
+              href={booking.instagram_page_url || undefined}
+              full
             />
             <Row
               label="Lead delivery"
@@ -156,50 +225,124 @@ export default async function AdminBookingDetailPage({ params }) {
               label="Leads WhatsApp"
               value={booking.leads_whatsapp_number}
             />
-            <Row label="Duration" value={duration} />
+          </dl>
+        </section>
+
+        <section className="rounded-lg border border-border-soft bg-white p-5 shadow-elev1">
+          <h2 className="font-display text-sm font-semibold text-navy">
+            Property & budget
+          </h2>
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
             <Row
-              label="Property"
+              label="Property type"
               value={
                 booking.property_type
                   ? labelForOption(PROPERTY_TYPE_OPTIONS, booking.property_type)
                   : null
               }
             />
-            <Row label="Location" value={booking.property_location} />
-            <Row label="Audience" value={booking.target_audience} />
+            <Row label="Property location" value={booking.property_location} />
+            <Row label="Price range" value={booking.price_range} />
             <Row
-              label="Language"
-              value={labelForOption(AD_LANGUAGE_OPTIONS, booking.ad_language)}
+              label="Property count"
+              value={
+                booking.property_count != null
+                  ? String(booking.property_count)
+                  : null
+              }
             />
             <Row
-              label="Creatives"
-              value={labelForOption(
-                CONTENT_READY_OPTIONS,
-                booking.has_content_ready
-              )}
+              label="Target audience"
+              value={booking.target_audience}
+              full
             />
-            <Row label="Goals" value={goals} />
-            <Row label="Notes" value={booking.additional_notes} />
+            <Row
+              label="Include ad budget"
+              value={yesNo(booking.include_ad_budget)}
+            />
+            <Row label="Desired ad budget" value={booking.desired_ad_budget} />
+            <Row label="Campaign duration" value={duration} />
+            <Row
+              label="Custom duration"
+              value={
+                booking.campaign_duration === "custom"
+                  ? booking.custom_campaign_duration
+                  : null
+              }
+            />
           </dl>
         </section>
 
         <section className="rounded-lg border border-border-soft bg-white p-5 shadow-elev1">
           <h2 className="font-display text-sm font-semibold text-navy">
-            Assets
+            Content & goals
           </h2>
-          <dl className="mt-4 grid gap-3">
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Row
+              label="Content ready"
+              value={labelForOption(
+                CONTENT_READY_OPTIONS,
+                booking.has_content_ready
+              )}
+            />
+            <Row
+              label="Ad language"
+              value={labelForOption(AD_LANGUAGE_OPTIONS, booking.ad_language)}
+            />
+            <Row label="Goals" value={goals} full />
+            <Row
+              label="External content"
+              value={booking.external_content_url}
+              href={booking.external_content_url || undefined}
+              full
+            />
+            <Row
+              label="Additional notes"
+              value={booking.additional_notes}
+              full
+            />
+            <Row
+              label="Terms accepted"
+              value={yesNo(booking.terms_accepted)}
+            />
+            <Row
+              label="Terms accepted at"
+              value={
+                booking.terms_accepted_at
+                  ? new Date(booking.terms_accepted_at).toLocaleString()
+                  : null
+              }
+            />
+          </dl>
+        </section>
+
+        <section className="rounded-lg border border-border-soft bg-white p-5 shadow-elev1 lg:col-span-2">
+          <h2 className="font-display text-sm font-semibold text-navy">
+            Uploaded assets
+          </h2>
+          <dl className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Row
+              label="Logo"
+              value={booking.logo_url ? "Open logo" : null}
+              href={booking.logo_url || undefined}
+            />
             <Row
               label="Video"
               value={booking.video_url ? "Open video" : null}
               href={booking.video_url || undefined}
             />
-            <Row
-              label="External link"
-              value={booking.external_content_url}
-              href={booking.external_content_url || undefined}
-            />
-            {imageUrls.length ? (
+            {booking.logo_url ? (
               <div>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={booking.logo_url}
+                  alt="Logo"
+                  className="h-20 w-20 rounded border border-border-soft object-contain"
+                />
+              </div>
+            ) : null}
+            {imageUrls.length ? (
+              <div className="sm:col-span-2">
                 <dt className="font-body text-[11px] font-bold uppercase tracking-[0.08em] text-neutral-gray">
                   Images ({imageUrls.length})
                 </dt>
@@ -222,7 +365,9 @@ export default async function AdminBookingDetailPage({ params }) {
                   ))}
                 </dd>
               </div>
-            ) : null}
+            ) : (
+              <Row label="Images" value="None uploaded" />
+            )}
           </dl>
         </section>
       </div>

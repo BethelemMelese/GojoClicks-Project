@@ -37,7 +37,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `/admin/bookings` | Bookings list + payment verification |
 | `/studio` | Sanity Studio (manage packages) |
 | `/api/upload-signature` | Cloudinary signed upload |
-| `/api/booking` | Create pending booking |
+| `/api/contact` | Consultation form → Resend team email |
 
 ## Pay-first bookings
 
@@ -60,9 +60,13 @@ Run this SQL if the table already exists:
 
 ## Admin
 
-1. Set `ADMIN_PASSWORD` in `.env.local` (optional `ADMIN_SESSION_SECRET`)
+1. Set a strong `ADMIN_PASSWORD` and a separate `ADMIN_SESSION_SECRET` (e.g. `openssl rand -base64 32`) in `.env.local`
 2. Open `/admin/login`
 3. Review transaction IDs + receipts and update status
+
+Sessions are signed tokens in an httpOnly cookie (12h expiry; never the raw password). Logout clears the cookie.
+
+Public APIs (`/api/booking`, `/api/contact`, `/api/upload-signature`) and admin login are rate-limited by IP (in-memory). Fine for a single Node process; for multi-instance serverless later, swap in a shared store (e.g. Upstash).
 
 ## Sanity packages
 
@@ -90,7 +94,9 @@ After a booking is saved, Resend sends:
 1. **Team alert** to `BOOKING_NOTIFY_TO` — payment details + **Open in admin**
 2. **Customer confirmation** to the client’s booking email — reference, package, transaction ID
 
-Email failures never block booking creation.
+When an admin changes status (`paid`, `failed`, `cancelled`, or back to `pending`), the customer also gets a **status update email**.
+
+Email failures never block booking creation or status updates.
 
 With Resend’s test sender (`onboarding@resend.dev`), mail can only go to your Resend account email. For real customer delivery, verify your domain and set `EMAIL_FROM` to that domain.
 

@@ -36,6 +36,11 @@ export function createSupabaseServiceClient() {
       autoRefreshToken: false,
       persistSession: false,
     },
+    // Avoid Next.js fetch caching of PostgREST responses
+    global: {
+      fetch: (input, init) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
     // API routes only need PostgREST — skip realtime websocket init on Node 20
     realtime: {
       params: { eventsPerSecond: 0 },

@@ -2,13 +2,17 @@ import { NextResponse } from "next/server";
 import {
   ADMIN_COOKIE,
   adminCookieOptions,
+  createAdminSessionToken,
   getAdminPassword,
-  getAdminSessionValue,
 } from "@/lib/adminAuth";
+import { enforceRateLimit } from "@/lib/rateLimit";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(request) {
+  const limited = await enforceRateLimit(request, "login");
+  if (limited) return limited;
+
   try {
     const body = await request.json().catch(() => ({}));
     const password = String(body.password || "");
@@ -31,10 +35,13 @@ export async function POST(request) {
       );
     }
 
-    const session = getAdminSessionValue();
+    const session = await createAdminSessionToken();
     if (!session) {
       return NextResponse.json(
-        { error: "Admin session secret is not configured" },
+        {
+          error:
+            "Admin session secret is not configured. Set ADMIN_SESSION_SECRET (or ADMIN_PASSWORD).",
+        },
         { status: 500 }
       );
     }
