@@ -4,9 +4,8 @@ import Reveal from "@/components/ui/Reveal";
 import SectionHeading from "@/components/ui/SectionHeading";
 import { IconArrowRight } from "@/components/ui/Icons";
 import PackageCard from "@/components/packages/PackageCard";
-import { HOME_PACKAGES } from "@/lib/constants/packages";
 
-export default function PackagesSection() {
+export default function PackagesSection({ packages = [] }) {
   return (
     <section id="packages" className="bg-off-white py-16 md:py-20">
       <Container>
@@ -17,8 +16,8 @@ export default function PackagesSection() {
         />
 
         <div className="grid items-stretch gap-5 md:grid-cols-3 md:gap-6 lg:gap-7">
-          {HOME_PACKAGES.map((pkg, index) => (
-            <PackageCard key={pkg.id} package={pkg} index={index} />
+          {packages.map((pkg, index) => (
+            <PackageCard key={pkg.id || pkg.slug} package={pkg} index={index} />
           ))}
         </div>
 

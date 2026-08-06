@@ -1,3 +1,6 @@
+import AssetUploader from "@/components/booking/AssetUploader";
+import FormSection from "@/components/booking/FormSection";
+import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
 import { formatEtb } from "@/lib/packages";
 import {
@@ -11,12 +14,15 @@ import {
   resolvedLeadsWhatsappNumber,
   resolvedWhatsappNumber,
 } from "@/lib/constants/booking";
+import { UPLOAD_LIMITS } from "@/lib/constants/uploads";
 
 export default function StepConfirm({
   package: pkg,
   form,
   errors,
   onChange,
+  onFieldChange,
+  onUploadBusyChange,
   submitError,
 }) {
   const contactWhatsapp = resolvedWhatsappNumber(form);
@@ -39,7 +45,6 @@ export default function StepConfirm({
     ...(form.leadDeliveryMethod === "whatsapp"
       ? [["Leads WhatsApp", leadsWhatsapp || "—"]]
       : []),
-
     [
       "Property type",
       form.propertyType
@@ -91,6 +96,40 @@ export default function StepConfirm({
         </dl>
       </div>
 
+      <FormSection title="Payment proof">
+        <div className="rounded-lg border border-gold/40 bg-[#fff8eb] p-4">
+          <p className="font-body text-sm leading-6 text-on-surface-variant">
+            Enter the transaction ID from your Telebirr or CBE Birr transfer of{" "}
+            <strong className="text-navy">{formatEtb(pkg.price)}</strong>, and
+            upload the receipt so we can verify payment.
+          </p>
+        </div>
+
+        <Input
+          id="paymentTransactionId"
+          label="Transaction / Reference ID"
+          placeholder="e.g. Telebirr or CBE Birr reference"
+          value={form.paymentTransactionId}
+          onChange={onChange("paymentTransactionId")}
+          error={errors.paymentTransactionId}
+        />
+
+        <AssetUploader
+          label="Payment proof (image or PDF)"
+          hint="Screenshot or PDF receipt — required"
+          accept={UPLOAD_LIMITS.paymentProof.accept}
+          allowedFormats={UPLOAD_LIMITS.paymentProof.allowedFormats}
+          maxFiles={UPLOAD_LIMITS.paymentProof.maxFiles}
+          maxSizeBytes={UPLOAD_LIMITS.paymentProof.maxSizeBytes}
+          resourceType={UPLOAD_LIMITS.paymentProof.resourceType}
+          folder={UPLOAD_LIMITS.paymentProof.folder}
+          value={form.paymentProofAsset}
+          onChange={onFieldChange("paymentProofAsset")}
+          onBusyChange={onUploadBusyChange}
+          error={errors.paymentProofAsset}
+        />
+      </FormSection>
+
       <Textarea
         id="additionalNotes"
         label="Additional Notes"
@@ -107,8 +146,9 @@ export default function StepConfirm({
           className="mt-1 accent-gold"
         />
         <span className="font-body text-sm text-on-surface-variant">
-          I agree to the GojoClicks advertising terms and authorize campaign
-          management for the selected package.
+          I confirm I have paid for this package, agree to the GojoClicks
+          advertising terms, and authorize campaign management for the selected
+          package.
         </span>
       </label>
       {errors.termsAccepted ? (

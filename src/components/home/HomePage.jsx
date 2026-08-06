@@ -4,13 +4,13 @@ import ServicesSection from "@/components/home/ServicesSection";
 import PackagesSection from "@/components/home/PackagesSection";
 import CtaBanner from "@/components/home/CtaBanner";
 
-export default function HomePage() {
+export default function HomePage({ featuredPackages = [] }) {
   return (
     <>
       <HeroSection />
       <StatsBar />
       <ServicesSection />
-      <PackagesSection />
+      <PackagesSection packages={featuredPackages} />
       <CtaBanner />
     </>
   );

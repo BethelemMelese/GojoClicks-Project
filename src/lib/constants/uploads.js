@@ -23,4 +23,13 @@ export const UPLOAD_LIMITS = {
     resourceType: "video",
     folder: "gojoclicks/bookings/videos",
   },
+  paymentProof: {
+    accept: "image/png,image/jpeg,image/webp,application/pdf",
+    allowedFormats: ["png", "jpg", "jpeg", "webp", "pdf"],
+    maxFiles: 1,
+    maxSizeBytes: 10 * 1024 * 1024,
+    /** Cloudinary auto accepts image or raw PDF in one endpoint */
+    resourceType: "auto",
+    folder: "gojoclicks/bookings/payment-proofs",
+  },
 };

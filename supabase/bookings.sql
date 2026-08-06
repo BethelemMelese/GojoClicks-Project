@@ -103,6 +103,10 @@ create table if not exists public.bookings (
   terms_accepted boolean not null default false,
   terms_accepted_at timestamptz,
 
+  -- 10. Pay-first proof (manual verification)
+  payment_transaction_id text,
+  payment_proof_url text,
+
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
 

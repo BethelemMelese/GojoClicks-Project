@@ -1,15 +1,15 @@
 # GojoClicks
 
-Package booking frontend for an Ethiopian advertising agency. Clients browse packages (Sanity), submit campaign assets (Cloudinary), create bookings (Supabase), and will later pay via Telebirr through a separate payment service.
+Package booking frontend for an Ethiopian advertising agency. Clients browse packages (Sanity), upload campaign assets (Cloudinary), pay first and submit a transaction ID + receipt, then create bookings (Supabase). The team verifies payments in a password-protected admin panel.
 
 ## Stack
 
 - Next.js 14 (App Router) + Tailwind CSS
 - Design system: see [`DESIGN.md`](./DESIGN.md) (Kinetic Authority)
 - Sanity CMS — advertising packages
-- Supabase — bookings + payment status
-- Cloudinary — signed direct uploads
-- External payment service (later) — Telebirr on a fixed-IP host
+- Supabase — bookings + payment verification status
+- Cloudinary — signed direct uploads (creatives + payment proof)
+- Resend — booking notification emails
 
 ## Getting started
 
@@ -19,7 +19,7 @@ Use Node 18.17+ (Node 20 recommended; see `.nvmrc`).
 nvm use
 npm install
 cp .env.example .env.local
-# fill in Sanity / Supabase / Cloudinary values
+# fill in Sanity / Supabase / Cloudinary / Resend / admin values
 npm run dev
 ```
 
@@ -31,57 +31,68 @@ Open [http://localhost:3000](http://localhost:3000).
 |------|---------|
 | `/` | Home + featured packages |
 | `/packages` | All packages |
-| `/packages/[slug]` | Package detail + booking stepper shell |
-| `/booking/confirmation` | Post-payment confirmation |
-| `/booking/failed` | Failed / pending payment |
-| `/how-it-works` | Static flow explanation |
+| `/packages/[slug]` | Package detail + booking stepper |
+| `/booking/confirmation` | Booking received |
+| `/admin/login` | Admin sign-in |
+| `/admin/bookings` | Bookings list + payment verification |
 | `/studio` | Sanity Studio (manage packages) |
 | `/api/upload-signature` | Cloudinary signed upload |
-| `/api/booking` | Create pending booking (+ payment URL when configured) |
-| `/api/booking/status` | Booking status lookup |
+| `/api/booking` | Create pending booking |
 
-## Sanity Studio
+## Pay-first bookings
 
-1. Add CORS origins in [Sanity Manage](https://www.sanity.io/manage) → your project → **API** → **CORS origins**:
-   - `http://localhost:3000`
-   - your Vercel URL (e.g. `https://gojoclicks-project.vercel.app`)
-   - Allow credentials: on
-2. Run `npm run dev` and open [http://localhost:3000/studio](http://localhost:3000/studio)
-3. Log in with the Sanity account that owns the project
-4. Create **Advertising Package** documents (title, slug, price, features, image, featured)
-5. Publish — they appear on `/` (if featured) and `/packages`
+Before the booking form starts, clients see **Telebirr** and **CBE Birr** account numbers (each with a copy button) and the package amount. After paying, they continue into the form. On Confirm they must provide:
+
+1. **Transaction / reference ID**
+2. **Payment proof** — image or PDF receipt (Cloudinary)
+
+Bookings stay `pending` until you mark them `paid` (or `failed` / `cancelled`) in `/admin/bookings`.
+
+Configure accounts via:
+
+- `NEXT_PUBLIC_PAYMENT_ACCOUNT_NAME`
+- `NEXT_PUBLIC_PAYMENT_TELEBIRR_NUMBER`
+- `NEXT_PUBLIC_PAYMENT_CBE_BIRR_NUMBER`
+
+Run this SQL if the table already exists:
+
+[`supabase/migrations/20260805_payment_proof.sql`](./supabase/migrations/20260805_payment_proof.sql)
+
+## Admin
+
+1. Set `ADMIN_PASSWORD` in `.env.local` (optional `ADMIN_SESSION_SECRET`)
+2. Open `/admin/login`
+3. Review transaction IDs + receipts and update status
+
+## Sanity packages
+
+Home and `/packages` load from Sanity when documents exist; otherwise mock packages are used as a fallback.
+
+1. Add CORS origins in [Sanity Manage](https://www.sanity.io/manage)
+2. Open `/studio`, create **Advertising Package** documents, publish
 
 ## Supabase bookings table
 
-1. Open [Supabase Dashboard](https://supabase.com/dashboard) → your project
-2. Go to **SQL Editor** → **New query**
-3. Paste the contents of [`supabase/bookings.sql`](./supabase/bookings.sql)
-4. Click **Run**
-5. Confirm under **Table Editor** that `bookings` exists
+1. Open [Supabase Dashboard](https://supabase.com/dashboard) → SQL Editor
+2. Run [`supabase/bookings.sql`](./supabase/bookings.sql) (fresh) or the migrations under `supabase/migrations/`
+3. Confirm under **Table Editor** that `bookings` exists
 
-The table stores the full client registration form. Row Level Security is enabled with no public policies — only the server `SUPABASE_SERVICE_ROLE_KEY` (used in API routes) can read/write bookings.
-
-Allowed values worth knowing:
-
-| Column | Values |
-|--------|--------|
+| Column / field | Notes |
+|----------------|--------|
 | `status` | `pending`, `paid`, `failed`, `cancelled` |
-| `ad_platform` | `gojoclicks`, `own_page`, `both` |
-| `lead_delivery_method` | `whatsapp`, `phone_calls`, `messenger`, `instagram_dm`, `email`, `dashboard` |
-| `property_type` | `apartment`, `villa_house`, `condominium`, `commercial`, `land`, `office`, `other` |
-| `campaign_duration` | `7_days`, `15_days`, `30_days`, `60_days`, `custom` |
-| `has_content_ready` | `yes`, `needs_creation` |
-| `ad_language` | `amharic`, `english`, `both` |
+| `payment_transaction_id` | Client-submitted transfer reference |
+| `payment_proof_url` | Cloudinary URL of image/PDF receipt |
 
 ## Booking email alerts
 
-After a booking is saved to Supabase, the API sends a notification via [Resend](https://resend.com) to `BOOKING_NOTIFY_TO` (default: `melesebety2673@gmail.com`). Email failures never block booking creation.
+After a booking is saved, Resend sends:
 
-1. Create a Resend account and API key
-2. Add `RESEND_API_KEY`, `BOOKING_NOTIFY_TO`, and `EMAIL_FROM` to `.env.local` (see `.env.example`)
-3. For production, verify your domain in Resend and set `EMAIL_FROM` to that domain (testing can use `onboarding@resend.dev`)
+1. **Team alert** to `BOOKING_NOTIFY_TO` — payment details + **Open in admin**
+2. **Customer confirmation** to the client’s booking email — reference, package, transaction ID
 
-**Email logo:** `public/brand/logo.png` — embedded inline (CID) in [`src/lib/email/bookingNotification.js`](./src/lib/email/bookingNotification.js), so it works even on localhost.
+Email failures never block booking creation.
+
+With Resend’s test sender (`onboarding@resend.dev`), mail can only go to your Resend account email. For real customer delivery, verify your domain and set `EMAIL_FROM` to that domain.
 
 ## Environment
 

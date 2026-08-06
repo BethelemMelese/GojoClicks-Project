@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { sendBookingNotification } from "@/lib/email/bookingNotification";
+import { sendBookingEmails } from "@/lib/email/bookingNotification";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
@@ -17,30 +17,14 @@ const REQUIRED_FIELDS = [
   "hasContentReady",
   "adLanguage",
   "goals",
+  "paymentTransactionId",
+  "paymentProofUrl",
   "termsAccepted",
 ];
 
-function isUsablePaymentUrl(value) {
-  if (!value || typeof value !== "string") return false;
-  const trimmed = value.trim();
-  if (!trimmed || trimmed.includes("example") || trimmed.includes("ethiopia/api")) {
-    // Placeholder / stub hosts — skip payment until a real VPS URL is configured
-    return false;
-  }
-  try {
-    const url = new URL(trimmed);
-    return url.protocol === "http:" || url.protocol === "https:";
-  } catch {
-    return false;
-  }
-}
-
 /**
- * Creates a booking with status "pending", then (when configured) calls the
- * external payment service and returns a payment redirect URL.
- *
- * Telebirr logic lives on the VPS payment service — not in this app.
- * Payment failures must NOT fail the booking itself.
+ * Creates a booking with status "pending".
+ * Clients pay first and submit a transaction ID + receipt proof for manual verification.
  */
 export async function POST(request) {
   try {
@@ -148,6 +132,8 @@ export async function POST(request) {
         logo_url: body.logoUrl || null,
         goals: body.goals,
         additional_notes: body.additionalNotes || null,
+        payment_transaction_id: String(body.paymentTransactionId).trim(),
+        payment_proof_url: body.paymentProofUrl || null,
         terms_accepted: true,
         terms_accepted_at: termsAcceptedAt,
       })
@@ -162,67 +148,13 @@ export async function POST(request) {
       );
     }
 
-    // Notify team by email; failures must not fail the booking.
-    await sendBookingNotification(booking);
+    await sendBookingEmails(booking);
 
-    const paymentServiceUrl = process.env.PAYMENT_SERVICE_URL;
-    const paymentServiceSecret = process.env.PAYMENT_SERVICE_SECRET;
-
-    if (!isUsablePaymentUrl(paymentServiceUrl)) {
-      return NextResponse.json({
-        booking,
-        paymentUrl: null,
-        message: "Booking received. Our team will follow up with next steps.",
-      });
-    }
-
-    try {
-      const base = paymentServiceUrl.replace(/\/$/, "");
-      const paymentResponse = await fetch(`${base}/payments/start`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${paymentServiceSecret}`,
-        },
-        body: JSON.stringify({
-          bookingId: booking.id,
-          reference: booking.reference,
-          amount: booking.amount,
-          currency: "ETB",
-          customer: {
-            name: body.fullName,
-            email: body.email,
-            phone: body.phone,
-          },
-        }),
-      });
-
-      if (!paymentResponse.ok) {
-        const paymentError = await paymentResponse.text();
-        console.error("Payment service error:", paymentError);
-        return NextResponse.json({
-          booking,
-          paymentUrl: null,
-          message:
-            "Booking received. We’ll contact you shortly to complete payment.",
-        });
-      }
-
-      const paymentData = await paymentResponse.json();
-
-      return NextResponse.json({
-        booking,
-        paymentUrl: paymentData.paymentUrl || paymentData.url || null,
-      });
-    } catch (paymentError) {
-      console.error("Payment service unreachable:", paymentError);
-      return NextResponse.json({
-        booking,
-        paymentUrl: null,
-        message:
-          "Booking received. We’ll contact you shortly to complete payment.",
-      });
-    }
+    return NextResponse.json({
+      booking,
+      message:
+        "Booking received. Our team will verify your payment and follow up shortly.",
+    });
   } catch (error) {
     console.error("booking error:", error);
     return NextResponse.json(

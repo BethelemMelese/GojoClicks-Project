@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+import BookingPaymentGate from "@/components/booking/BookingPaymentGate";
 import StepperProgress from "@/components/booking/StepperProgress";
 import StepAssets from "@/components/booking/steps/StepAssets";
 import StepConfirm from "@/components/booking/steps/StepConfirm";
@@ -20,6 +21,7 @@ import {
 
 export default function BookingStepper({ package: pkg }) {
   const router = useRouter();
+  const [paidReady, setPaidReady] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(() => createInitialBookingForm());
   const [errors, setErrors] = useState({});
@@ -55,11 +57,22 @@ export default function BookingStepper({ package: pkg }) {
       5: {
         title: "Confirm Booking",
         description:
-          "Review your details, then confirm to send your booking request.",
+          "Review your details, then submit your transaction ID and payment proof.",
       },
     }),
     []
   );
+
+  if (!paidReady) {
+    return (
+      <div className="rounded-lg border border-border-soft bg-white p-4 shadow-elev2 md:p-6">
+        <BookingPaymentGate
+          package={pkg}
+          onContinue={() => setPaidReady(true)}
+        />
+      </div>
+    );
+  }
 
   const onChange = (field) => (event) => {
     const value =
@@ -85,8 +98,9 @@ export default function BookingStepper({ package: pkg }) {
       field === "videoAsset" ||
       field === "assetMediaType" ||
       field === "externalContentUrl" ||
-      field === "hasContentReady"
-        ? { assets: undefined }
+      field === "hasContentReady" ||
+      field === "paymentProofAsset"
+        ? { assets: undefined, paymentProofAsset: undefined }
         : null),
     }));
     setSubmitError("");
@@ -127,11 +141,6 @@ export default function BookingStepper({ package: pkg }) {
       const reference = data.booking?.reference;
       if (!reference) {
         throw new Error("Booking was created without a reference");
-      }
-
-      if (data.paymentUrl) {
-        window.location.href = data.paymentUrl;
-        return;
       }
 
       router.push(`/booking/confirmation?ref=${encodeURIComponent(reference)}`);
@@ -182,6 +191,8 @@ export default function BookingStepper({ package: pkg }) {
             form={form}
             errors={errors}
             onChange={onChange}
+            onFieldChange={onFieldChange}
+            onUploadBusyChange={handleUploadBusyChange}
             submitError={submitError}
           />
         ) : null}
@@ -222,9 +233,13 @@ export default function BookingStepper({ package: pkg }) {
             type="button"
             variant="primary"
             onClick={handleSubmit}
-            disabled={submitting || !form.termsAccepted}
+            disabled={submitting || uploadBusy || !form.termsAccepted}
           >
-            {submitting ? "Submitting..." : "Confirm Booking"}
+            {submitting
+              ? "Submitting..."
+              : uploadBusy
+                ? "Uploading..."
+                : "Submit Booking"}
             {!submitting ? <IconCheck className="h-4 w-4" /> : null}
           </Button>
         )}
