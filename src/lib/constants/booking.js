@@ -125,6 +125,9 @@ export function createInitialBookingForm() {
     videoAsset: null,
     goals: ["leads"],
     additionalNotes: "",
+    paymentTransactionId: "",
+    /** @type {{ url: string, name: string, size?: number } | null} */
+    paymentProofAsset: null,
     termsAccepted: false,
   };
 }
@@ -227,9 +230,21 @@ export function validateBookingStep(step, form) {
     }
   }
 
-  // 5 — Confirm
-  if (step === 5 && form.termsAccepted !== true) {
-    errors.termsAccepted = "Please accept the terms to continue";
+  // 5 — Confirm + payment proof
+  if (step === 5) {
+    requireTrimmed(
+      form.paymentTransactionId,
+      "Enter your transaction / reference ID",
+      errors,
+      "paymentTransactionId"
+    );
+    if (!assetUrl(form.paymentProofAsset)) {
+      errors.paymentProofAsset =
+        "Upload a payment screenshot or PDF receipt";
+    }
+    if (form.termsAccepted !== true) {
+      errors.termsAccepted = "Please accept the terms to continue";
+    }
   }
 
   return errors;
@@ -277,6 +292,8 @@ export function buildBookingPayload(form, pkg) {
     logoUrl: assetUrl(form.logoAsset) || null,
     goals: form.goals,
     additionalNotes: form.additionalNotes.trim() || null,
+    paymentTransactionId: form.paymentTransactionId.trim(),
+    paymentProofUrl: assetUrl(form.paymentProofAsset) || null,
     termsAccepted: true,
   };
 }

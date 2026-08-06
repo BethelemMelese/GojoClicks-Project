@@ -6,6 +6,7 @@
 | `logo_oval.png` | **Footer** (`BrandLogo` dark) — circular mark on navy |
 | `logo_have.png` | Alternate horizontal mark |
 | `logo_no_white.png` | Alternate stacked mark |
+| `favicon-source.png` | Source crop used for site favicon (`src/app/icon.png`, `favicon.ico`) |
 
 `BrandLogo` picks assets via `variant`:
 

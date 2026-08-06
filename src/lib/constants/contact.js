@@ -71,6 +71,6 @@ export const CONTACT_FAQS = [
   {
     question: "How does payment work?",
     answer:
-      "After you submit a booking, our team confirms your package and guides you through payment. You’ll receive clear next steps by phone or email.",
+      "Pay first with Telebirr or CBE Birr using the account numbers on the package page. Then complete the booking form and submit your transaction ID plus a receipt screenshot or PDF. Our team verifies payment and emails you the status.",
   },
 ];

@@ -1,24 +1,27 @@
 import { notFound } from "next/navigation";
 import PackageDetailPage from "@/components/packages/PackageDetailPage";
 import {
-  getAllMockPackageSlugs,
-  getMockPackageBySlug,
+  loadAllPackageSlugs,
+  loadPackageBySlug,
 } from "@/lib/packages";
 
-export function generateStaticParams() {
-  return getAllMockPackageSlugs().map((slug) => ({ slug }));
+export const revalidate = 60;
+
+export async function generateStaticParams() {
+  const slugs = await loadAllPackageSlugs();
+  return slugs.map((slug) => ({ slug }));
 }
 
-export function generateMetadata({ params }) {
-  const pkg = getMockPackageBySlug(params.slug);
+export async function generateMetadata({ params }) {
+  const pkg = await loadPackageBySlug(params.slug);
   return {
     title: pkg ? `${pkg.title} — GojoClicks` : "Package — GojoClicks",
     description: pkg?.description,
   };
 }
 
-export default function Page({ params }) {
-  const pkg = getMockPackageBySlug(params.slug);
+export default async function Page({ params }) {
+  const pkg = await loadPackageBySlug(params.slug);
 
   if (!pkg) {
     notFound();

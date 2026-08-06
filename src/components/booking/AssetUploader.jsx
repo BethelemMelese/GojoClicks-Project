@@ -200,6 +200,9 @@ export default function AssetUploader({
         <ul className="mt-3 grid gap-2 sm:grid-cols-2">
           {items.map((item, index) => {
             const isVideo = resourceType === "video";
+            const isPdf =
+              /\.pdf($|\?)/i.test(item.url || "") ||
+              /\.pdf$/i.test(item.name || "");
             return (
               <li
                 key={`${item.url}-${index}`}
@@ -208,6 +211,10 @@ export default function AssetUploader({
                 {isVideo ? (
                   <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-navy font-display text-[10px] font-bold uppercase text-gold">
                     Video
+                  </div>
+                ) : isPdf ? (
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded bg-navy font-display text-[10px] font-bold uppercase text-gold">
+                    PDF
                   </div>
                 ) : (
                   // eslint-disable-next-line @next/next/no-img-element

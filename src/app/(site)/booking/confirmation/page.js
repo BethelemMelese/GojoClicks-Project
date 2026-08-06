@@ -43,9 +43,9 @@ export default async function BookingConfirmationPage({ searchParams }) {
             Thank you — we received your booking.
           </h1>
           <p className="mt-3 font-body text-body-md text-neutral-gray">
-            Our team will review your details and creatives, then contact you
-            shortly with next steps. Please keep your reference number for
-            follow-up.
+            We also sent a confirmation to your email. Our team will verify your
+            payment transaction, review your details and creatives, then contact
+            you with next steps. Keep your reference number for follow-up.
           </p>
 
           <dl className="mt-8 grid gap-4 sm:grid-cols-2">
@@ -82,6 +82,16 @@ export default async function BookingConfirmationPage({ searchParams }) {
                 </dt>
                 <dd className="mt-1 font-body text-sm text-navy">
                   {formatEtb(booking.amount)}
+                </dd>
+              </div>
+            ) : null}
+            {booking?.payment_transaction_id ? (
+              <div className="sm:col-span-2">
+                <dt className="font-body text-[11px] font-bold uppercase tracking-[0.08em] text-neutral-gray">
+                  Transaction ID submitted
+                </dt>
+                <dd className="mt-1 font-body text-sm text-navy">
+                  {booking.payment_transaction_id}
                 </dd>
               </div>
             ) : null}

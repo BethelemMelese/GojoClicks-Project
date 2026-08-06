@@ -20,7 +20,7 @@ async function getUploadSignature({ folder, allowedFormats } = {}) {
 /**
  * @param {File} file
  * @param {object} options
- * @param {'image'|'video'} [options.resourceType]
+ * @param {'image'|'video'|'auto'|'raw'} [options.resourceType]
  * @param {string} [options.folder]
  * @param {string[]} [options.allowedFormats]
  * @param {(pct: number) => void} [options.onProgress]
