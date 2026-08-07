@@ -12,7 +12,7 @@ export const MOCK_PACKAGES = [
     duration: "10-Day Campaign",
     reach: "30,000+",
     views: "20,000+",
-    leads: "40+",
+    leads: "20+",
     description:
       "Perfect for testing the market with focused Facebook & Instagram ads and steady WhatsApp lead delivery.",
     industry: "real-estate",
@@ -62,7 +62,7 @@ export const MOCK_PACKAGES = [
     duration: "10-Day Campaign",
     reach: "100,000+",
     views: "70,000+",
-    leads: "150+",
+    leads: "80+",
     description:
       "Our most popular tier for agencies ready to convert attention into consistent WhatsApp and call leads.",
     industry: "agency",
@@ -89,7 +89,7 @@ export const MOCK_PACKAGES = [
     duration: "10-Day Campaign",
     reach: "150,000+",
     views: "100,000+",
-    leads: "250+",
+    leads: "120+",
     description:
       "Built for growing portfolios that need broader reach, stronger reporting, and priority campaign support.",
     industry: "agency",
