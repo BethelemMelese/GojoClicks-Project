@@ -15,11 +15,8 @@ export default function PackagesBespokeCta() {
             markets, and growth goals — beyond the standard package tiers.
           </p>
           <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-            <Button href="/how-it-works" variant="navy">
+            <Button href="/contact" variant="navy">
               Schedule a Consultation
-            </Button>
-            <Button href="/how-it-works" variant="secondary">
-              Download Media Kit
             </Button>
           </div>
         </Reveal>

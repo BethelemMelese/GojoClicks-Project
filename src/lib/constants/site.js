@@ -52,7 +52,7 @@ export const FOOTER_LEGAL_LINKS = [
 export const HOME_STATS = [
   { end: 500, suffix: "+", label: "Clients Managed" },
   { end: 98, suffix: "%", label: "Retention Rate" },
-  { end: 2, prefix: "$", suffix: "B+", label: "Ad Spend Handled" },
+  { end: 20, prefix: "$", suffix: "K+", label: "Ad Spend Handled" },
   { end: 15, suffix: "+", label: "Media Channels" },
 ];
 
