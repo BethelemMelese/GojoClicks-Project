@@ -3,6 +3,7 @@ export const BOOKING_STEPS = [
   { id: "platform", label: "Platform" },
   { id: "property", label: "Property" },
   { id: "assets", label: "Assets" },
+  { id: "payment", label: "Pay" },
   { id: "confirm", label: "Confirm" },
 ];
 
@@ -230,7 +231,7 @@ export function validateBookingStep(step, form) {
     }
   }
 
-  // 5 — Confirm + payment proof
+  // 5 — Payment
   if (step === 5) {
     requireTrimmed(
       form.paymentTransactionId,
@@ -242,6 +243,10 @@ export function validateBookingStep(step, form) {
       errors.paymentProofAsset =
         "Upload a payment screenshot or PDF receipt";
     }
+  }
+
+  // 6 — Confirm
+  if (step === 6) {
     if (form.termsAccepted !== true) {
       errors.termsAccepted = "Please accept the terms to continue";
     }

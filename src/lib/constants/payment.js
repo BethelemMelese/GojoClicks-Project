@@ -1,5 +1,5 @@
 /**
- * Pay-before-booking accounts (Telebirr + CBE Birr).
+ * Booking payment accounts (Telebirr + CBE Birr).
  * Override via env in production without a code change.
  */
 export function getPaymentAccounts() {

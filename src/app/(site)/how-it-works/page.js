@@ -5,7 +5,7 @@ import Reveal from "@/components/ui/Reveal";
 export const metadata = {
   title: "How it works — GojoClicks",
   description:
-    "Pay first with Telebirr or CBE Birr, complete your booking details, and launch your GojoClicks campaign.",
+    "Choose a package, complete your booking details, pay with Telebirr or CBE Birr, and launch your GojoClicks campaign.",
 };
 
 const STEPS = [
@@ -16,18 +16,18 @@ const STEPS = [
   },
   {
     number: "02",
-    title: "Pay first",
-    body: "Transfer the package amount with Telebirr or CBE Birr using the account numbers shown. Copy the number you need, then continue.",
+    title: "Complete the booking form",
+    body: "Share your contact details, where ads should run, how leads should reach you, your property brief, and campaign creatives.",
   },
   {
     number: "03",
-    title: "Complete the booking form",
-    body: "Share your contact details, where ads should run, how leads should reach you, and your property brief.",
+    title: "Pay for your package",
+    body: "Transfer the package amount with Telebirr or CBE Birr, then enter your transaction ID and upload the payment receipt.",
   },
   {
     number: "04",
-    title: "Submit creatives & payment proof",
-    body: "Upload images or video for the campaign, then enter your transaction ID and attach the payment receipt.",
+    title: "Confirm & submit",
+    body: "Review your booking summary, accept the terms, and submit your request.",
   },
   {
     number: "05",
@@ -49,8 +49,8 @@ export default function HowItWorksPage() {
               How GojoClicks booking works
             </h1>
             <p className="mt-4 max-w-xl font-body text-base leading-7 text-white/75">
-              Pay first, submit your campaign details and receipt, then we
-              verify payment and get your ads ready — with clear email updates
+              Complete your campaign details, pay with Telebirr or CBE Birr, then
+              we verify payment and get your ads ready — with clear email updates
               along the way.
             </p>
           </Reveal>
