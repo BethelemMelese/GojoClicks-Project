@@ -3,11 +3,11 @@
 import { useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
-import BookingPaymentGate from "@/components/booking/BookingPaymentGate";
 import StepperProgress from "@/components/booking/StepperProgress";
 import StepAssets from "@/components/booking/steps/StepAssets";
 import StepConfirm from "@/components/booking/steps/StepConfirm";
 import StepContact from "@/components/booking/steps/StepContact";
+import StepPayment from "@/components/booking/steps/StepPayment";
 import StepPlatform from "@/components/booking/steps/StepPlatform";
 import StepProperty from "@/components/booking/steps/StepProperty";
 import { IconArrowRight, IconCheck } from "@/components/ui/Icons";
@@ -21,7 +21,6 @@ import {
 
 export default function BookingStepper({ package: pkg }) {
   const router = useRouter();
-  const [paidReady, setPaidReady] = useState(false);
   const [step, setStep] = useState(1);
   const [form, setForm] = useState(() => createInitialBookingForm());
   const [errors, setErrors] = useState({});
@@ -55,24 +54,17 @@ export default function BookingStepper({ package: pkg }) {
         description: "Upload creatives, choose language, and set your goals.",
       },
       5: {
-        title: "Confirm Booking",
+        title: `Pay for ${pkg.title}`,
         description:
-          "Review your details, then submit your transaction ID and payment proof.",
+          "Transfer the package amount with Telebirr or CBE Birr, then submit your transaction ID and receipt.",
+      },
+      6: {
+        title: "Confirm Booking",
+        description: "Review your details and submit your booking request.",
       },
     }),
-    []
+    [pkg.title]
   );
-
-  if (!paidReady) {
-    return (
-      <div className="rounded-lg border border-border-soft bg-white p-4 shadow-elev2 md:p-6">
-        <BookingPaymentGate
-          package={pkg}
-          onContinue={() => setPaidReady(true)}
-        />
-      </div>
-    );
-  }
 
   const onChange = (field) => (event) => {
     const value =
@@ -186,13 +178,21 @@ export default function BookingStepper({ package: pkg }) {
           />
         ) : null}
         {step === 5 ? (
-          <StepConfirm
+          <StepPayment
             package={pkg}
             form={form}
             errors={errors}
             onChange={onChange}
             onFieldChange={onFieldChange}
             onUploadBusyChange={handleUploadBusyChange}
+          />
+        ) : null}
+        {step === 6 ? (
+          <StepConfirm
+            package={pkg}
+            form={form}
+            errors={errors}
+            onChange={onChange}
             submitError={submitError}
           />
         ) : null}

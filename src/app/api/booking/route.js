@@ -25,7 +25,7 @@ const REQUIRED_FIELDS = [
 
 /**
  * Creates a booking with status "pending".
- * Clients pay first and submit a transaction ID + receipt proof for manual verification.
+ * Clients submit a transaction ID + receipt proof for manual verification.
  */
 export async function POST(request) {
   const limited = await enforceRateLimit(request, "booking");
