@@ -25,7 +25,7 @@ export default function CtaBanner() {
                 Schedule a strategic consultation with our media architects today.
               </p>
             </div>
-            <Button href="/packages" variant="navy" className="shrink-0">
+            <Button href="/contact" variant="navy" className="shrink-0">
               Get in touch
             </Button>
           </div>

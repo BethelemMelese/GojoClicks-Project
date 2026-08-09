@@ -47,6 +47,6 @@ export const ABOUT_OVERVIEW = {
   imageAlt: "Contemporary residential property with landscaped entrance",
   stats: [
     { value: "500+", label: "Partnerships" },
-    { value: "$1.2B", label: "Managed Ad Spend" },
+    { value: "$20k+", label: "Managed Ad Spend" },
   ],
 };
