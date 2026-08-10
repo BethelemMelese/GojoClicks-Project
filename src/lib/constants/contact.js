@@ -21,11 +21,25 @@ export const CONTACT_DETAILS = [
     href: "mailto:hello@gojoclicks.com",
   },
   {
+    id: "whatsapp",
+    icon: "whatsapp",
+    title: "WhatsApp",
+    body: "0567972092",
+    href: "https://wa.me/251567972092",
+  },
+  {
+    id: "telegram",
+    icon: "telegram",
+    title: "Telegram",
+    body: "0567972092",
+    href: "https://t.me/+251567972092",
+  },
+  {
     id: "phone",
     icon: "phone",
-    title: "Partnership Line",
-    body: "+251 911 000 000",
-    href: "tel:+251911000000",
+    title: "Call",
+    body: "0910889725",
+    href: "tel:+251910889725",
   },
 ];
 
