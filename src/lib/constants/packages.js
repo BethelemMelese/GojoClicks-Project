@@ -26,31 +26,6 @@ export const MOCK_PACKAGES = [
     featured: false,
   },
   {
-    id: "growth",
-    slug: "growth",
-    title: "Growth",
-    icon: "chart",
-    image:
-      "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?auto=format&fit=crop&w=1200&q=80",
-    imageAlt: "Contemporary residential property",
-    price: 7500,
-    duration: "10-Day Campaign",
-    reach: "60,000+",
-    views: "40,000+",
-    leads: "80+",
-    description:
-      "Scale your local reach with stronger targeting and optimized creatives built for more property inquiries.",
-    industry: "real-estate",
-    badge: "NEW",
-    features: [
-      "Targeted Audience",
-      "Daily Optimization",
-      "Lead Delivery (WhatsApp)",
-      "Performance Report",
-    ],
-    featured: false,
-  },
-  {
     id: "professional",
     slug: "professional",
     title: "Professional",
