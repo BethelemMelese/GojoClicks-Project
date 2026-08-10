@@ -191,6 +191,44 @@ export function IconPhone({ className = "h-5 w-5" }) {
   );
 }
 
+export function IconWhatsApp({ className = "h-5 w-5" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M12 3.5a8.5 8.5 0 00-7.2 12.9L4 20.5l4.3-.8A8.5 8.5 0 1012 3.5z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.2 9.4c.2-.5.4-.5.6-.5h.5c.2 0 .4.1.5.4l.7 1.7c.1.2 0 .4-.1.6l-.4.5c-.1.1-.1.3 0 .4.4.7 1.1 1.4 1.8 1.8.1.1.3.1.4 0l.5-.4c.2-.1.4-.2.6-.1l1.7.7c.3.1.4.3.4.5v.5c0 .2 0 .4-.5.6-.4.2-1 .3-1.6.1-1.5-.4-3-1.5-4.2-2.7-1.2-1.2-2.3-2.7-2.7-4.2-.2-.6-.1-1.2.1-1.6z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+export function IconTelegram({ className = "h-5 w-5" }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M20.5 4.5L3.8 11.1c-1.1.4-1.1 1.1-.2 1.4l4.3 1.3 1.7 5.1c.2.7.7.8 1.2.5l2.5-2.4 4.7 3.5c.6.3 1 .2 1.2-.5l2.8-13.2c.3-1.1-.4-1.6-1.1-1.3z"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.9 13.7l7.4-4.6"
+        stroke="currentColor"
+        strokeWidth="1.5"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
 export function IconLightbulb({ className = "h-5 w-5" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>

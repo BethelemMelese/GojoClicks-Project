@@ -3,20 +3,28 @@ import {
   IconMail,
   IconMapPin,
   IconPhone,
+  IconTelegram,
+  IconWhatsApp,
 } from "@/components/ui/Icons";
 
 const icons = {
   map: IconMapPin,
   mail: IconMail,
   phone: IconPhone,
+  whatsapp: IconWhatsApp,
+  telegram: IconTelegram,
 };
 
 export default function ContactDetailItem({ item }) {
   const Icon = icons[item.icon] || IconMapPin;
+  const isExternal = Boolean(item.href?.startsWith("http"));
   const body = item.href ? (
     <a
       href={item.href}
       className="font-body text-sm text-neutral-gray transition duration-300 hover:text-navy"
+      {...(isExternal
+        ? { target: "_blank", rel: "noopener noreferrer" }
+        : {})}
     >
       {item.body}
     </a>
