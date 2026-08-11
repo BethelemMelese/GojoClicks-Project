@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import BookingStatusForm from "@/components/admin/BookingStatusForm";
+import DeleteBookingButton from "@/components/admin/DeleteBookingButton";
 import { getBookingById } from "@/lib/adminBookings";
 import { formatEtb } from "@/lib/packages";
 import {
@@ -110,6 +111,10 @@ export default async function AdminBookingDetailPage({ params }) {
           <BookingStatusForm
             bookingId={booking.id}
             initialStatus={booking.status}
+          />
+          <DeleteBookingButton
+            bookingId={booking.id}
+            reference={booking.reference}
           />
         </div>
       </div>

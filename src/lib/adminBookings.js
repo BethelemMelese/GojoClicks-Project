@@ -73,3 +73,48 @@ export async function getBookingById(id) {
   }
   return data;
 }
+
+export async function deleteBookingById(id) {
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("bookings")
+    .delete()
+    .eq("id", id)
+    .select("id, reference")
+    .maybeSingle();
+
+  if (error) {
+    console.error("deleteBookingById error:", error);
+    throw error;
+  }
+  return data;
+}
+
+/**
+ * @param {string[]} ids
+ * @returns {Promise<{ deleted: number, ids: string[] }>}
+ */
+export async function deleteBookingsByIds(ids) {
+  const unique = [...new Set((ids || []).map(String).filter(Boolean))];
+  if (unique.length === 0) {
+    return { deleted: 0, ids: [] };
+  }
+  if (unique.length > 100) {
+    throw new Error("You can delete at most 100 bookings at once");
+  }
+
+  const supabase = createSupabaseServiceClient();
+  const { data, error } = await supabase
+    .from("bookings")
+    .delete()
+    .in("id", unique)
+    .select("id");
+
+  if (error) {
+    console.error("deleteBookingsByIds error:", error);
+    throw error;
+  }
+
+  const deletedIds = (data || []).map((row) => row.id);
+  return { deleted: deletedIds.length, ids: deletedIds };
+}
