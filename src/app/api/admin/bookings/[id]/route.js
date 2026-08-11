@@ -1,11 +1,40 @@
 import { NextResponse } from "next/server";
 import { isAdminAuthenticated } from "@/lib/adminAuth";
+import { deleteBookingById } from "@/lib/adminBookings";
 import { sendCustomerStatusUpdateEmail } from "@/lib/email/bookingNotification";
 import { createSupabaseServiceClient } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
 const ALLOWED_STATUS = new Set(["pending", "paid", "failed", "cancelled"]);
+
+export async function DELETE(_request, { params }) {
+  if (!(await isAdminAuthenticated())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const id = params?.id;
+  if (!id) {
+    return NextResponse.json({ error: "Missing booking id" }, { status: 400 });
+  }
+
+  try {
+    const deleted = await deleteBookingById(id);
+    if (!deleted) {
+      return NextResponse.json({ error: "Booking not found" }, { status: 404 });
+    }
+    return NextResponse.json(
+      { ok: true, booking: deleted },
+      { headers: { "Cache-Control": "no-store" } }
+    );
+  } catch (error) {
+    console.error("admin booking delete error:", error);
+    return NextResponse.json(
+      { error: error.message || "Delete failed" },
+      { status: 500 }
+    );
+  }
+}
 
 export async function PATCH(request, { params }) {
   if (!(await isAdminAuthenticated())) {
